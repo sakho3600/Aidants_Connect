@@ -32,7 +32,7 @@ services:
     build: .
     volumes:
       - ./:/app
-    command: /bin/bash -lc "python manage.py test --exclude-tag=functional"
+    command: /bin/bash -lc "DJANGO_SETTINGS_MODULE=aidants_connect.settings pytest"
     working_dir: /app
     environment:
       HOST: localhost

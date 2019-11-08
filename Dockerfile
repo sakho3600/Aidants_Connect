@@ -1,9 +1,9 @@
-FROM python AS base
+FROM circleci/python:3.7.2-stretch-browsers AS base
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install -r requirements.txt
-RUN pip install honcho
-RUN mkdir /app/staticfiles
+RUN sudo mkdir /app/staticfiles
+RUN sudo pip install -r requirements.txt
+RUN sudo pip install honcho
 
 FROM base AS service
 WORKDIR /app
