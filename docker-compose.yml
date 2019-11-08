@@ -28,6 +28,23 @@ services:
       DEBUG: "True"
     depends_on:
       - postgres
+  test:
+    build: .
+    volumes:
+      - ./:/app
+    command: /bin/bash -lc "python manage.py test --exclude-tag=functional"
+    working_dir: /app
+    environment:
+      HOST: localhost
+      PORT: 3000
+      APP_SECRET: test_secret
+      DATABASE_NAME: aidants_connect
+      DATABASE_USER: aidants_connect_team
+      DATABASE_PASSWORD: test_db_pwd
+      DATABASE_HOST: postgres
+      DEBUG: "True"
+    depends_on:
+      - postgres
   postgres:
     image: postgres
     restart: always
