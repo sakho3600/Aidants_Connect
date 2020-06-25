@@ -108,9 +108,10 @@ def new_mandat_recap(request):
         form = RecapMandatForm(aidant=aidant, data=request.POST)
 
         if form.is_valid():
+            timezone_now = timezone.now()
             expiration_date = {
-                "SHORT": timezone.now() + timedelta(days=1),
-                "LONG": timezone.now() + timedelta(days=365),
+                "SHORT": timezone_now + timedelta(days=1),
+                "LONG": timezone_now + timedelta(days=365),
                 "EUS_03_20": settings.ETAT_URGENCE_2020_LAST_DAY,
             }
             mandat_expiration_date = expiration_date.get(connection.duree_keyword)
@@ -118,7 +119,7 @@ def new_mandat_recap(request):
                 "SHORT": 1,
                 "LONG": 365,
                 "EUS_03_20": 1
-                + (settings.ETAT_URGENCE_2020_LAST_DAY - timezone.now()).days,
+                + (settings.ETAT_URGENCE_2020_LAST_DAY - timezone_now).days,
             }
             mandat_duree = days_before_expiration_date.get(connection.duree_keyword)
             try:
@@ -147,17 +148,33 @@ def new_mandat_recap(request):
 
                 # This loop creates one `autorisation` object per `démarche` in the form
                 for demarche in connection.demarches:
-                    Autorisation.objects.update_or_create(
+                    # Revoke existing demarche autorisation(s)
+                    similar_active_autorisations = Autorisation.objects.active().filter(
+                        mandat__organisation=aidant.organisation,
+                        mandat__usager=usager,
+                        demarche=demarche,
+                    )
+                    for similar_active_autorisation in similar_active_autorisations:
+                        similar_active_autorisation.revocation_date = timezone_now
+                        similar_active_autorisation.save(
+                            update_fields=["revocation_date"]
+                        )
+                        Journal.objects.autorisation_update(
+                            similar_active_autorisation, aidant
+                        )
+                        Journal.objects.autorisation_cancel(
+                            similar_active_autorisation, aidant
+                        )
+
+                    # Create new demarche autorisation
+                    Autorisation.objects.create(
                         aidant=aidant,
                         usager=usager,
                         demarche=demarche,
-                        defaults={
-                            "mandat": mandat,
-                            "expiration_date": mandat_expiration_date,
-                            "last_renewal_date": timezone.now(),
-                            "last_renewal_token": connection.access_token,
-                            "is_remote": connection.mandat_is_remote,
-                        },
+                        mandat=mandat,
+                        expiration_date=mandat_expiration_date,
+                        last_renewal_token=connection.access_token,
+                        is_remote=True,
                     )
 
             except AttributeError as error:

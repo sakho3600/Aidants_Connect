@@ -18,6 +18,7 @@ from aidants_connect_web.models import (
 )
 from aidants_connect_web.tests.factories import (
     AidantFactory,
+    MandatFactory,
     AutorisationFactory,
     OrganisationFactory,
     UsagerFactory,
@@ -159,24 +160,6 @@ class AutorisationModelTests(TestCase):
         self.assertEqual(first_autorisation.demarche, "Carte grise")
         self.assertEqual(second_autorisation.usager.family_name, "Flanders")
 
-    def test_cannot_have_two_autorisations_for_user_demarche_tuple(self):
-        AutorisationFactory(
-            aidant=self.aidant_marge,
-            usager=self.usager_homer,
-            demarche="Logement",
-            expiration_date=timezone.now() + timedelta(days=3),
-        )
-        self.assertEqual(Autorisation.objects.count(), 1)
-
-        self.assertRaises(
-            IntegrityError,
-            Autorisation.objects.create,
-            aidant=self.aidant_marge,
-            usager=self.usager_homer,
-            demarche="Logement",
-            expiration_date=timezone.now() + timedelta(days=6),
-        )
-
     fake_date = datetime(2019, 1, 14, tzinfo=pytz_timezone("Europe/Paris"))
 
     @freeze_time(fake_date)
@@ -254,53 +237,94 @@ class AidantModelMethodsTests(TestCase):
         cls.usager_homer = UsagerFactory(given_name="Homer")
         cls.usager_ned = UsagerFactory(given_name="Ned")
         cls.usager_bart = UsagerFactory(given_name="Bart")
+        cls.mandat_marge_homer_1 = MandatFactory(
+            organisation=cls.aidant_marge.organisation,
+            usager=cls.usager_homer,
+            expiration_date=timezone.now() - timedelta(days=6),
+        )
+        cls.mandat_marge_homer_2 = MandatFactory(
+            organisation=cls.aidant_marge.organisation,
+            usager=cls.usager_homer,
+            expiration_date=timezone.now() + timedelta(days=6),
+        )
+        cls.mandat_marge_homer_3 = MandatFactory(
+            organisation=cls.aidant_marge.organisation,
+            usager=cls.usager_homer,
+            expiration_date=timezone.now() + timedelta(days=365),
+        )
+        cls.mandat_marge_ned_1 = MandatFactory(
+            organisation=cls.aidant_marge.organisation,
+            usager=cls.usager_ned,
+            expiration_date=timezone.now() - timedelta(days=6),
+        )
+        cls.mandat_marge_ned_2 = MandatFactory(
+            organisation=cls.aidant_marge.organisation,
+            usager=cls.usager_ned,
+            expiration_date=timezone.now() + timedelta(days=6),
+        )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_homer,
             demarche="Carte grise",
+            mandat=cls.mandat_marge_homer_1,
             expiration_date=timezone.now() - timedelta(days=6),
         )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_homer,
-            demarche="social",
-            expiration_date=timezone.now() + timedelta(days=365),
+            demarche="Revenus",
+            mandat=cls.mandat_marge_homer_2,
+            expiration_date=timezone.now() + timedelta(days=6),
         )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_homer,
-            demarche="Revenus",
-            expiration_date=timezone.now() + timedelta(days=6),
+            demarche="social",
+            mandat=cls.mandat_marge_homer_3,
+            expiration_date=timezone.now() + timedelta(days=365),
         )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_ned,
             demarche="Logement",
+            mandat=cls.mandat_marge_ned_1,
             expiration_date=timezone.now() - timedelta(days=6),
         )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_ned,
             demarche="transports",
+            mandat=cls.mandat_marge_ned_2,
             expiration_date=timezone.now() + timedelta(days=6),
         )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_ned,
             demarche="famille",
+            mandat=cls.mandat_marge_ned_2,
             expiration_date=timezone.now() + timedelta(days=6),
         )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_ned,
             demarche="social",
+            mandat=cls.mandat_marge_ned_2,
             expiration_date=timezone.now() + timedelta(days=6),
         )
         AutorisationFactory(
             aidant=cls.aidant_marge,
             usager=cls.usager_ned,
             demarche="travail",
+            mandat=cls.mandat_marge_ned_2,
             expiration_date=timezone.now() + timedelta(days=6),
+        )
+        AutorisationFactory(
+            aidant=cls.aidant_marge,
+            usager=cls.usager_ned,
+            demarche="papiers",
+            mandat=cls.mandat_marge_ned_2,
+            expiration_date=timezone.now() + timedelta(days=6),
+            revocation_date=timezone.now(),
         )
 
     def test_get_usagers(self):
@@ -355,10 +379,10 @@ class AidantModelMethodsTests(TestCase):
             0,
         )
 
-    def test_get_expired_autorisations_for_usager(self):
+    def test_get_inactive_autorisations_for_usager(self):
         self.assertEqual(
             len(
-                self.aidant_marge.get_expired_autorisations_for_usager(
+                self.aidant_marge.get_inactive_autorisations_for_usager(
                     self.usager_homer
                 )
             ),
@@ -366,29 +390,35 @@ class AidantModelMethodsTests(TestCase):
         )
         self.assertEqual(
             len(
-                self.aidant_marge.get_expired_autorisations_for_usager(self.usager_ned)
+                self.aidant_marge.get_inactive_autorisations_for_usager(self.usager_ned)
             ),
-            1,
+            2,
         )
         self.assertEqual(
             len(
-                self.aidant_marge.get_expired_autorisations_for_usager(self.usager_bart)
+                self.aidant_marge.get_inactive_autorisations_for_usager(
+                    self.usager_bart
+                )
             ),
             0,
         )
         self.assertEqual(
             len(
-                self.aidant_lisa.get_expired_autorisations_for_usager(self.usager_homer)
+                self.aidant_lisa.get_inactive_autorisations_for_usager(
+                    self.usager_homer
+                )
             ),
             1,
         )
         self.assertEqual(
-            len(self.aidant_lisa.get_expired_autorisations_for_usager(self.usager_ned)),
-            1,
+            len(
+                self.aidant_lisa.get_inactive_autorisations_for_usager(self.usager_ned)
+            ),
+            2,
         )
         self.assertEqual(
             len(
-                self.aidant_lisa.get_expired_autorisations_for_usager(self.usager_bart)
+                self.aidant_lisa.get_inactive_autorisations_for_usager(self.usager_bart)
             ),
             0,
         )
@@ -483,14 +513,14 @@ class JournalModelTests(TestCase):
 
     def test_log_autorisation_update_complete(self):
         entry = Journal.objects.autorisation_update(
-            autorisation=self.first_autorisation
+            autorisation=self.first_autorisation, aidant=self.aidant_thierry
         )
         self.assertEqual(len(Journal.objects.all()), 3)
         self.assertEqual(entry.action, "update_autorisation")
 
     def test_log_autorisation_cancel_complete(self):
         entry = Journal.objects.autorisation_cancel(
-            autorisation=self.first_autorisation
+            autorisation=self.first_autorisation, aidant=self.aidant_thierry
         )
         self.assertEqual(len(Journal.objects.all()), 3)
         self.assertEqual(entry.action, "cancel_autorisation")

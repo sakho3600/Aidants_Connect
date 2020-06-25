@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 
@@ -87,13 +88,13 @@ class Aidant(AbstractUser):
         """
         return self.get_autorisations_for_usager(usager).active()
 
-    def get_expired_autorisations_for_usager(self, usager):
+    def get_inactive_autorisations_for_usager(self, usager):
         """
         :param usager:
-        :return: a queryset of the specified usager's expired autorisations
-        that are visible by this aidant.
+        :return: a queryset of the specified usager's inactive (expired or revoked)
+        autorisations that are visible by this aidant.
         """
-        return self.get_autorisations_for_usager(usager).expired()
+        return self.get_autorisations_for_usager(usager).inactive()
 
     def get_active_demarches_for_usager(self, usager):
         """
@@ -240,13 +241,34 @@ class Mandat(models.Model):
     )
     is_remote = models.BooleanField(default=False)
 
+    @property
+    def is_expired(self) -> bool:
+        return timezone.now() > self.expiration_date
+
 
 class AutorisationQuerySet(models.QuerySet):
     def active(self):
-        return self.exclude(expiration_date__lt=timezone.now())
+        return self.exclude(mandat__expiration_date__lt=timezone.now()).filter(
+            revocation_date__isnull=True
+        )
+
+    def inactive(self):
+        return self.filter(
+            Q(mandat__expiration_date__lt=timezone.now())
+            | (
+                Q(mandat__expiration_date__gt=timezone.now())
+                & Q(revocation_date__isnull=False)
+            )
+        )
 
     def expired(self):
-        return self.exclude(expiration_date__gt=timezone.now())
+        return self.filter(mandat__expiration_date__lt=timezone.now())
+
+    def revoked(self):
+        return self.filter(
+            Q(mandat__expiration_date__gt=timezone.now())
+            & Q(revocation_date__isnull=False)
+        )
 
     def for_usager(self, usager):
         return self.filter(usager=usager)
@@ -275,16 +297,13 @@ class Autorisation(models.Model):
     # Autorisation expiration date management
     creation_date = models.DateTimeField(default=timezone.now)
     expiration_date = models.DateTimeField(default=timezone.now)
-    last_renewal_date = models.DateTimeField(default=timezone.now)
+    revocation_date = models.DateTimeField(blank=True, null=True)
 
     # Journal entry creation information
     last_renewal_token = models.TextField(blank=False, default="No token provided")
     is_remote = models.BooleanField(default=False)
 
     objects = AutorisationQuerySet.as_manager()
-
-    class Meta:
-        unique_together = ["aidant", "demarche", "usager"]
 
     def __str__(self):
         return (
@@ -293,12 +312,16 @@ class Autorisation(models.Model):
         )
 
     @property
-    def is_expired(self):
-        return timezone.now() > self.expiration_date
+    def is_revoked(self) -> bool:
+        return True if self.revocation_date else False
+
+    @property
+    def is_expired(self) -> bool:
+        return self.mandat.is_expired
 
     @property
     def duree_in_days(self):
-        duree_for_computer = self.expiration_date - self.last_renewal_date
+        duree_for_computer = self.expiration_date - self.creation_date
         # we add one day so that duration is human friendly
         # i.e. for a human, there is one day between now and tomorrow at the same time,
         # and 0 for a computer
@@ -434,7 +457,6 @@ class JournalManager(models.Manager):
             action="create_autorisation",
             demarche=autorisation.demarche,
             duree=autorisation.duree_in_days,
-            access_token=autorisation.last_renewal_date,
             autorisation=autorisation.id,
             # COVID-19
             is_remote_mandat=autorisation.is_remote,
@@ -445,7 +467,7 @@ class JournalManager(models.Manager):
         )
         return journal_entry
 
-    def autorisation_update(self, autorisation: Autorisation):
+    def autorisation_update(self, autorisation: Autorisation, aidant: Aidant):
         aidant = autorisation.aidant
         usager = autorisation.usager
 
@@ -455,7 +477,6 @@ class JournalManager(models.Manager):
             action="update_autorisation",
             demarche=autorisation.demarche,
             duree=autorisation.duree_in_days,
-            access_token=autorisation.last_renewal_date,
             autorisation=autorisation.id,
             # COVID-19
             is_remote_mandat=autorisation.is_remote,
@@ -484,14 +505,13 @@ class JournalManager(models.Manager):
         )
         return journal_entry
 
-    def autorisation_cancel(self, autorisation: Autorisation):
+    def autorisation_cancel(self, autorisation: Autorisation, aidant: Aidant):
         journal_entry = self.create(
             initiator=autorisation.aidant.full_string_identifier,
             usager=autorisation.usager.full_string_identifier,
             action="cancel_autorisation",
             demarche=autorisation.demarche,
             duree=autorisation.duree_in_days,
-            access_token=autorisation.last_renewal_date,
             autorisation=autorisation.id,
         )
         return journal_entry
