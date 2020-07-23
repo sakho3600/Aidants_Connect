@@ -10,6 +10,8 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 
+from aidants_connect import constants
+
 from aidants_connect_web.forms import OTPForm
 from aidants_connect_web.models import Aidant, Journal, Mandat, Organisation, Usager
 
@@ -26,7 +28,7 @@ def humanize_demarche_names(name: str) -> str:
     :param machine_names:
     :return: list of human names and description
     """
-    demarches = settings.DEMARCHES
+    demarches = constants.DEMARCHES
     return f"{demarches[name]['titre'].upper()}: {demarches[name]['description']}"
 
 
@@ -106,11 +108,11 @@ def statistiques(request):
 
     # # Démarches
     demarches_count = []
-    for demarche in settings.DEMARCHES.keys():
+    for demarche in constants.DEMARCHES.keys():
         demarches_count.append(
             {
                 "title": demarche,
-                "icon": settings.DEMARCHES[demarche]["icon"],
+                "icon": constants.DEMARCHES[demarche]["icon"],
                 "value": autorisation_use.filter(demarche=demarche).count(),
             }
         )

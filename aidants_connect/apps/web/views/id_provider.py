@@ -21,6 +21,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 import jwt
 
+from aidants_connect import constants
+
 from aidants_connect_web.decorators import activity_required
 from aidants_connect_web.models import (
     Connection,
@@ -182,7 +184,7 @@ def fi_select_demarche(request):
         usager_demarches = aidant.get_active_demarches_for_usager(connection.usager)
 
         demarches = {
-            nom_demarche: settings.DEMARCHES[nom_demarche]
+            nom_demarche: constants.DEMARCHES[nom_demarche]
             for nom_demarche in usager_demarches
         }
 
