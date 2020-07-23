@@ -13,7 +13,7 @@ from aidants_connect_web.decorators import activity_required
 from aidants_connect_web.forms import MandatForm, RecapMandatForm
 from aidants_connect_web.models import Autorisation, Connection, Journal, Mandat
 from aidants_connect_web.views.service import humanize_demarche_names
-from aidants_connect_web.utilities import (
+from aidants_connect_web.utils import (
     generate_file_sha256_hash,
     generate_sha256_hash,
     generate_qrcode_png,

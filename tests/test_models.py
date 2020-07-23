@@ -24,7 +24,7 @@ from aidants_connect_web.tests.factories import (
     OrganisationFactory,
     UsagerFactory,
 )
-from aidants_connect_web.utilities import (
+from aidants_connect_web.utils import (
     generate_file_sha256_hash,
     validate_attestation_hash,
 )

@@ -1,7 +1,7 @@
-import io
 import hashlib
-import qrcode
+import io
 from pathlib import Path
+import qrcode
 
 from django.conf import settings
 

@@ -1,6 +1,6 @@
 [
     {
-        "model": "aidants_connect_web.usager",
+        "model": "usagers.usager",
         "pk": 1,
         "fields": {
             "given_name": "Angela Claire Louise",
@@ -16,7 +16,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.mandat",
+        "model": "mandats.mandat",
         "pk": 1,
         "fields": {
             "organisation": 1,
@@ -26,7 +26,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.autorisation",
+        "model": "mandats.autorisation",
         "pk": 1,
         "fields": {
             "mandat": 1,
@@ -35,7 +35,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.autorisation",
+        "model": "mandats.autorisation",
         "pk": 2,
         "fields": {
             "mandat": 1,
@@ -44,7 +44,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.journal",
+        "model": "logs.journal",
         "pk": 1,
         "fields": {
             "action": "connect_aidant",
@@ -58,7 +58,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.journal",
+        "model": "logs.journal",
         "pk": 2,
         "fields": {
             "action": "print_autorisation",
@@ -72,7 +72,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.journal",
+        "model": "logs.journal",
         "pk": 3,
         "fields": {
             "action": "create_autorisation",
@@ -86,7 +86,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.journal",
+        "model": "logs.journal",
         "pk": 4,
         "fields": {
             "action": "create_autorisation",

@@ -11,7 +11,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 
 from aidants_connect_web.models import Connection, Usager, Journal
-from aidants_connect_web.utilities import generate_sha256_hash
+from aidants_connect_web.utils import generate_sha256_hash
 
 
 logging.basicConfig(level=logging.INFO)

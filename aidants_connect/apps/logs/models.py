@@ -1,12 +1,14 @@
-from datetime import timedelta
-
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q
-from django.utils import timezone
-from django.utils.functional import cached_property
+
+from ..aidants.models import Aidant
+from ..mandats.models import Autorisation
+from ..usagers.models import Usager
+
+
+class JournalQuerySet(models.QuerySet):
+    def excluding_staff(self):
+        return self.exclude(initiator__icontains=settings.STAFF_ORGANISATION_NAME)
 
 
 class Journal(models.Model):
@@ -43,6 +45,7 @@ class Journal(models.Model):
     objects = JournalQuerySet.as_manager()
 
     class Meta:
+        db_table = "aidants_connect_web_journal"
         verbose_name = "entrée de journal"
         verbose_name_plural = "entrées de journal"
 

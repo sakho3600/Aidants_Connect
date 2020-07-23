@@ -4,7 +4,7 @@ from django.template.defaultfilters import pluralize
 
 from celery import shared_task
 
-from aidants_connect_web.models import Connection
+from .models import Connection
 
 
 logger = logging.getLogger()

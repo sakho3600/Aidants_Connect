@@ -13,7 +13,7 @@ from aidants_connect_web.tests.factories import (
     UsagerFactory,
 )
 from aidants_connect_web.tests.test_functional.testcases import FunctionalTestCase
-from aidants_connect_web.tests.test_functional.utilities import login_aidant
+from aidants_connect_web.tests.test_functional.utils import login_aidant
 
 
 FC_URL_PARAMETERS = (

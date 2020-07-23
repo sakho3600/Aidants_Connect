@@ -90,8 +90,8 @@ INSTALLED_APPS = [
     "django_extensions",
 
     # project apps
-    "aidants_connect.apps.accounts",
     "aidants_connect.apps.aidants",
+    "aidants_connect.apps.flexauth",  # flex·ible auth·entication
     "aidants_connect.apps.logs",
     "aidants_connect.apps.mandats",
     "aidants_connect.apps.usagers",

@@ -6,14 +6,15 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import F
 
-from aidants_connect_web.models import (
+from aidants_connect.apps.aidants.models import Aidant, Organisation
+from aidants_connect.apps.logs.models import Journal
+from aidants_connect.apps.mandats.models import (
     Autorisation,
     AutorisationDureeKeywords,
-    Journal,
     Mandat,
-    Organisation,
-    Usager,
 )
+from aidants_connect.apps.usagers.models import Usager
+
 
 
 class Command(BaseCommand):

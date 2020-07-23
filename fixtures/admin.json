@@ -1,6 +1,6 @@
 [
     {
-        "model": "aidants_connect_web.organisation",
+        "model": "aidants.organisation",
         "pk": 1,
         "fields": {
             "name": "BetaGouv",
@@ -9,7 +9,7 @@
         }
     },
     {
-        "model": "aidants_connect_web.aidant",
+        "model": "aidants.aidant",
         "pk": 1,
         "fields": {
             "password": "pbkdf2_sha256$180000$7NmfuvajMfYs$UF7wkVJIKHTb5BJobzMbTAUehJUpXon7wgTdVaaEiyk=",

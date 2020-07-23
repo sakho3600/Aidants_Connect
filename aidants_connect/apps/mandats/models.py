@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Q
@@ -10,9 +9,7 @@ from django.utils.functional import cached_property
 
 from aidants_connect import constants
 
-from aidants_connect.apps.aidants.models import Aidant, Organisation
-from aidants_connect.apps.usagers.models import Usager
-
+from ..aidants.models import Organisation
 
 
 class AutorisationDureeKeywords(models.TextChoices):
@@ -48,12 +45,16 @@ class MandatQuerySet(models.QuerySet):
 
 class Mandat(models.Model):
     organisation = models.ForeignKey(
-        Organisation,
+        "aidants.Organisation",
         on_delete=models.PROTECT,
         related_name="mandats",
         default=get_staff_organisation_name_id,
     )
-    usager = models.ForeignKey(Usager, on_delete=models.PROTECT, related_name="mandats")
+    usager = models.ForeignKey(
+        "usagers.Usager",
+        on_delete=models.PROTECT,
+        related_name="mandats"
+    )
     creation_date = models.DateTimeField("Date de création", default=timezone.now)
     expiration_date = models.DateTimeField("Date d'expiration", default=timezone.now)
     duree_keyword = models.CharField(
@@ -62,6 +63,9 @@ class Mandat(models.Model):
     is_remote = models.BooleanField("Signé à distance ?", default=False)
 
     objects = MandatQuerySet.as_manager()
+
+    class Meta:
+        db_table = "aidants_connect_web_mandat"
 
     def __str__(self):
         return f"#{self.id}"
@@ -138,6 +142,9 @@ class Autorisation(models.Model):
 
     objects = AutorisationQuerySet.as_manager()
 
+    class Meta:
+        db_table = "aidants_connect_web_autorisation"
+
     def __str__(self):
         return f"#{self.id}"
 
@@ -190,7 +197,7 @@ class Connection(models.Model):
     )
     mandat_is_remote = models.BooleanField(default=False)
     usager = models.ForeignKey(
-        Usager,
+        "usagers.Usager",
         blank=True,
         null=True,
         on_delete=models.CASCADE,
@@ -202,7 +209,7 @@ class Connection(models.Model):
     code = models.TextField()
     demarche = models.TextField(default="No demarche provided")
     aidant = models.ForeignKey(
-        Aidant,
+        "aidants.Aidant",
         blank=True,
         null=True,
         on_delete=models.CASCADE,
@@ -220,6 +227,7 @@ class Connection(models.Model):
     objects = ConnectionQuerySet.as_manager()
 
     class Meta:
+        db_table = "aidants_connect_web_connection"
         verbose_name = "connexion"
 
     def __str__(self):

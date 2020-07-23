@@ -1,22 +1,19 @@
-from datetime import timedelta
-
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q
-from django.utils import timezone
 from django.utils.functional import cached_property
 
-from aidants_connect.apps.logs.models import Journal
-from aidants_connect.apps.mandats.models import Autorisation
-from aidants_connect.apps.usagers.models import Usager
+from ..logs.models import Journal
+from ..mandats.models import Autorisation
+from ..usagers.models import Usager
 
 
 class Organisation(models.Model):
     name = models.TextField("Nom", default="No name provided")
     siret = models.PositiveIntegerField("N° SIRET", default=1)
     address = models.TextField("Adresse", default="No address provided")
+
+    class Meta:
+        db_table = "aidants_connect_web_organisation"
 
     def __str__(self):
         return f"{self.name}"
@@ -47,6 +44,7 @@ class Aidant(AbstractUser):
     )
 
     class Meta:
+        db_table = "aidants_connect_web_aidant"
         verbose_name = "aidant"
 
     def __str__(self):

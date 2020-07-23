@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from aidants_connect_web.tasks import delete_expired_connections
+from aidants_connect.apps.mandats.tasks import delete_expired_connections
 
 
 class Command(BaseCommand):

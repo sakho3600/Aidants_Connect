@@ -10,7 +10,7 @@ from django.test.client import Client
 
 from aidants_connect_web.models import Connection, Journal, Usager
 from aidants_connect_web.tests.factories import AidantFactory, UsagerFactory
-from aidants_connect_web.utilities import generate_sha256_hash
+from aidants_connect_web.utils import generate_sha256_hash
 from aidants_connect_web.views.FC_as_FS import get_user_info
 
 

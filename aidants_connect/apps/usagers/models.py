@@ -1,12 +1,7 @@
-from datetime import timedelta
-
-from django.conf import settings
-from django.contrib.auth.models import AbstractUser
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q
 from django.utils import timezone
-from django.utils.functional import cached_property
+
+from ..mandats.models import Autorisation, Mandat
 
 
 class UsagerQuerySet(models.QuerySet):
@@ -56,6 +51,7 @@ class Usager(models.Model):
     objects = UsagerQuerySet.as_manager()
 
     class Meta:
+        db_table = "aidants_connect_web_usager"
         ordering = ["family_name", "given_name"]
 
     def __str__(self):
