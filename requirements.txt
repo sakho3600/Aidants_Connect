@@ -1,13 +1,15 @@
-Django==3.0.7
+Django==3.0.8
 
 django-admin-honeypot==1.1.0
 django-celery-beat==2.0.0
 django-csp==3.6
 django-extensions==3.0.1
 django-nested-admin==3.3.2
-django-otp==0.9.3
+django-otp-yubikey==0.5.2
 django-referrer-policy==1.0
+django-sesame[ua]==2.0
 django-tabbed-admin==1.0.4
+django-two-factor-auth[phonenumbers]==1.12.1
 
 black==19.10b0
 celery[redis]==4.4.6
@@ -30,6 +32,5 @@ qrcode==6.1
 requests==2.24.0
 selenium==3.141.0
 sqlparse==0.3.1
+twilio==6.44.1
 whitenoise==5.1.0
-
-git+git://github.com/betagouv/django-magicauth@add_totp

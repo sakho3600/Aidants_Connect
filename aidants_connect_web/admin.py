@@ -1,6 +1,9 @@
 from django.contrib.admin import ModelAdmin, TabularInline
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
+from nested_admin import NestedModelAdmin, NestedTabularInline
+from tabbed_admin import TabbedModelAdmin
+
 from django_celery_beat.admin import (
     ClockedScheduleAdmin,
     PeriodicTaskAdmin,
@@ -19,10 +22,16 @@ from django_otp.plugins.otp_static.models import StaticDevice
 from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
-from magicauth.models import MagicToken
-
-from nested_admin import NestedModelAdmin, NestedTabularInline
-from tabbed_admin import TabbedModelAdmin
+from otp_yubikey.admin import (
+    RemoteYubikeyDeviceAdmin,
+    ValidationServiceAdmin,
+    YubikeyDeviceAdmin,
+)
+from otp_yubikey.models import (
+    RemoteYubikeyDevice,
+    ValidationService,
+    YubikeyDevice,
+)
 
 from aidants_connect_web.forms import AidantChangeForm, AidantCreationForm
 from aidants_connect_web.models import (
@@ -201,10 +210,12 @@ admin_site.register(Mandat, MandatAdmin)
 admin_site.register(Journal, JournalAdmin)
 admin_site.register(Connection, ConnectionAdmin)
 
-admin_site.register(MagicToken)
+# Also register the Django OTP models
 admin_site.register(StaticDevice, StaticDeviceAdmin)
 admin_site.register(TOTPDevice, TOTPDeviceAdmin)
-
+admin_site.register(YubikeyDevice, YubikeyDeviceAdmin)
+admin_site.register(ValidationService, ValidationServiceAdmin)
+admin_site.register(RemoteYubikeyDevice, RemoteYubikeyDeviceAdmin)
 
 # Also register the Django Celery Beat models
 admin_site.register(PeriodicTask, PeriodicTaskAdmin)

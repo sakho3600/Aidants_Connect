@@ -63,22 +63,33 @@ ALLOWED_HOSTS = [os.environ["HOST"]]
 # Application definition
 
 INSTALLED_APPS = [
+
+    # admin-related apps
     "django.contrib.admin",
     "nested_admin",
     "tabbed_admin",
-    "magicauth",
+    "admin_honeypot",
+
+    # auth-related apps
     "django.contrib.auth",
+    "django_otp",
+    "django_otp.plugins.otp_static",
+    "django_otp.plugins.otp_totp",
+    "otp_yubikey",
+    "two_factor",
+
+    # other standard Django apps
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "aidants_connect_web",
-    "admin_honeypot",
-    "django_otp",
-    "django_otp.plugins.otp_static",
-    "django_otp.plugins.otp_totp",
+
+    # third-party apps
     "django_celery_beat",
     "django_extensions",
+
+    # project app(s)
+    "aidants_connect_web",
 ]
 
 MIDDLEWARE = [
@@ -88,12 +99,19 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "sesame.middleware.AuthenticationMiddleware",
+
+    # Always include for two-factor auth
+    "django_otp.middleware.OTPMiddleware",
+
+    # Include for Twilio gateway
+    "two_factor.middleware.threadlocals.ThreadLocals",
+
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "django_referrer_policy.middleware.ReferrerPolicyMiddleware",
     "csp.middleware.CSPMiddleware",
-    "django_otp.middleware.OTPMiddleware",
 ]
 
 ROOT_URLCONF = "aidants_connect.urls"
@@ -153,6 +171,47 @@ else:
 if ssl_option:
     DATABASES["default"]["OPTIONS"] = {"sslmode": ssl_option}
 
+
+# Authentication
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "sesame.backends.ModelBackend",
+]
+
+SESAME_ONE_TIME = True
+SESAME_MAX_AGE = int(os.getenv("SESAME_MAX_AGE", 60 * 10))  # default: 10 mn
+
+TWO_FACTOR_PATCH_ADMIN = True
+
+TFA_GATEWAY_FAKE = "two_factor.gateways.fake.Fake"
+TFA_GATEWAY_TWILIO = "two_factor.gateways.twilio.gateway.Twilio"
+
+ENABLE_2FA_APP = (
+    True if os.getenv("ENABLE_2FA_APP") == "True" else False
+)
+
+ENABLE_2FA_SMS = (
+    True if os.getenv("ENABLE_2FA_SMS") == "True" else False
+)
+TWO_FACTOR_SMS_GATEWAY = TFA_GATEWAY_TWILIO if ENABLE_2FA_SMS else TFA_GATEWAY_FAKE
+
+ENABLE_2FA_CALL = (
+    True if os.getenv("ENABLE_2FA_CALL") == "True" else False
+)
+TWO_FACTOR_CALL_GATEWAY = TFA_GATEWAY_TWILIO if ENABLE_2FA_CALL else TFA_GATEWAY_FAKE
+
+ENABLE_2FA_KEY = (
+    True if os.getenv("ENABLE_2FA_KEY") == "True" else False
+)
+
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_CALLER_ID = os.getenv("TWILIO_CALLER_ID", "")
+
+PHONENUMBER_DEFAULT_REGION = "FR"
+
+
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -186,8 +245,10 @@ USE_TZ = True
 STATIC_ROOT = "staticfiles"
 STATIC_URL = "/static/"
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "two_factor:login"
+LOGIN_REDIRECT_URL = "two_factor:profile"
 LOGOUT_REDIRECT_URL = "home_page"
+
 ACTIVITY_CHECK_URL = "activity_check"
 ACTIVITY_CHECK_THRESHOLD = int(os.getenv("ACTIVITY_CHECK_THRESHOLD"))
 ACTIVITY_CHECK_DURATION = timedelta(minutes=ACTIVITY_CHECK_THRESHOLD)
@@ -271,21 +332,6 @@ MANDAT_TEMPLATE_PATH = (
     "templates/aidants_connect_web/mandat_templates/20200511_mandat.html"
 )
 ATTESTATION_SALT = os.getenv("ATTESTATION_SALT", "")
-
-# Magic Auth
-MAGICAUTH_EMAIL_FIELD = "email"
-MAGICAUTH_FROM_EMAIL = os.getenv("MAGICAUTH_FROM_EMAIL")
-MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "dashboard"
-MAGICAUTH_LOGIN_VIEW_TEMPLATE = "login/login.html"
-MAGICAUTH_EMAIL_SENT_VIEW_TEMPLATE = "login/email_sent.html"
-MAGICAUTH_EMAIL_HTML_TEMPLATE = "login/email_template.html"
-MAGICAUTH_EMAIL_TEXT_TEMPLATE = "login/email_template.txt"
-MAGICAUTH_ENABLE_2FA = True
-
-# https://github.com/betagouv/django-magicauth/blob/8a8143388bb15fad2823528201e22a31817da243/magicauth/settings.py#L54  # noqa
-MAGICAUTH_TOKEN_DURATION_SECONDS = int(
-    os.getenv("MAGICAUTH_TOKEN_DURATION_SECONDS", 5 * 60)
-)
 
 # TOTP
 OTP_TOTP_ISSUER = os.getenv("OTP_TOTP_ISSUER", "Aidants Connect")
