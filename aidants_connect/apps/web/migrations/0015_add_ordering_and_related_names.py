@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0014_auto_20200213_1706"),
+        ("web", "0014_auto_20200213_1706"),
     ]
 
     operations = [
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="aidants",
-                to="aidants_connect_web.Organisation",
+                to="aidants.Organisation",
             ),
         ),
         migrations.AlterField(
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="usagers",
-                to="aidants_connect_web.Mandat",
+                to="aidants_connect.mandats.Mandat",
             ),
         ),
         migrations.AlterField(
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="usagers",
-                to="aidants_connect_web.Usager",
+                to="usagers.Usager",
             ),
         ),
         migrations.AlterField(
@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
                 default=0,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="mandats",
-                to="aidants_connect_web.Usager",
+                to="usagers.Usager",
             ),
         ),
     ]

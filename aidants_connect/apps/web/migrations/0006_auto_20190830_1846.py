@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0005_auto_20190830_1837")]
+    dependencies = [("web", "0005_auto_20190830_1837")]
 
     operations = [
         migrations.AlterField(

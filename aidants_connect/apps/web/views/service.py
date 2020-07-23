@@ -12,8 +12,11 @@ from django.utils.http import url_has_allowed_host_and_scheme
 
 from aidants_connect import constants
 
-from aidants_connect_web.forms import OTPForm
-from aidants_connect_web.models import Aidant, Journal, Mandat, Organisation, Usager
+from aidants_connect.apps.aidants.models import Aidant, Organisation
+from aidants_connect.apps.logs.models import Journal
+from aidants_connect.apps.mandats.forms import OTPForm
+from aidants_connect.apps.mandats.models import Mandat
+from aidants_connect.apps.usagers.models import Usager
 
 
 logging.basicConfig(level=logging.INFO)

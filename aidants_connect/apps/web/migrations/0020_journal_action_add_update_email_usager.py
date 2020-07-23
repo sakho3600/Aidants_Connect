@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0019_normalize_usager_data"),
+        ("web", "0019_normalize_usager_data"),
     ]
 
     operations = [

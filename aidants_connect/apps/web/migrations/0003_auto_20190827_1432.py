@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0002_journal")]
+    dependencies = [("web", "0002_journal")]
 
     operations = [
         migrations.RemoveField(model_name="journal", name="demarches"),

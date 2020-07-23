@@ -1,9 +1,7 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 
-from django_celery_beat.admin import (
-    ClockedScheduleAdmin,
-    PeriodicTaskAdmin,
-)
+from admin_honeypot.models import LoginAttempt
 from django_celery_beat.models import (
     ClockedSchedule,
     CrontabSchedule,
@@ -11,22 +9,7 @@ from django_celery_beat.models import (
     PeriodicTask,
     SolarSchedule,
 )
-
-from django_otp.plugins.otp_static.admin import StaticDeviceAdmin
-from django_otp.plugins.otp_static.models import StaticDevice
-from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
-from django_otp.plugins.otp_totp.models import TOTPDevice
-
-from otp_yubikey.admin import (
-    RemoteYubikeyDeviceAdmin,
-    ValidationServiceAdmin,
-    YubikeyDeviceAdmin,
-)
-from otp_yubikey.models import (
-    RemoteYubikeyDevice,
-    ValidationService,
-    YubikeyDevice,
-)
+from two_factor.models import PhoneDevice
 
 
 class VisibleToStaff:
@@ -48,24 +31,18 @@ class VisibleToStaff:
         return self.has_module_permission(request)
 
 
-class StaticDeviceStaffAdmin(VisibleToStaff, StaticDeviceAdmin):
-    pass
+# Unregister the Django Group model
+admin.site.unregister(Group)
 
+# Unregister the Honeypot model
+admin.site.unregister(LoginAttempt)
 
-class TOTPDeviceStaffAdmin(VisibleToStaff, TOTPDeviceAdmin):
-    pass
+# Unregister the Django Two Factor Auth model
+admin.site.unregister(PhoneDevice)
 
-
-# Register the Django OTP models
-admin.site.register(StaticDevice, StaticDeviceAdmin)
-admin.site.register(TOTPDevice, TOTPDeviceAdmin)
-admin.site.register(YubikeyDevice, YubikeyDeviceAdmin)
-admin.site.register(ValidationService, ValidationServiceAdmin)
-admin.site.register(RemoteYubikeyDevice, RemoteYubikeyDeviceAdmin)
-
-# Register the Django Celery Beat models
-admin.site.register(PeriodicTask, PeriodicTaskAdmin)
-admin.site.register(IntervalSchedule)
-admin.site.register(CrontabSchedule)
-admin.site.register(SolarSchedule)
-admin.site.register(ClockedSchedule, ClockedScheduleAdmin)
+# Unregister the Django Celery Beat models
+admin.site.unregister(ClockedSchedule)
+admin.site.unregister(CrontabSchedule)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(PeriodicTask)
+admin.site.unregister(SolarSchedule)

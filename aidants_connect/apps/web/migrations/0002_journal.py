@@ -8,7 +8,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0001_initial")]
+    dependencies = [("web", "0001_initial")]
 
     operations = [
         migrations.CreateModel(

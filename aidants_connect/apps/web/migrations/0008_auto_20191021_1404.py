@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0007_mandat_modified_by_access_token")]
+    dependencies = [("web", "0007_mandat_modified_by_access_token")]
 
     operations = [
         migrations.AlterUniqueTogether(

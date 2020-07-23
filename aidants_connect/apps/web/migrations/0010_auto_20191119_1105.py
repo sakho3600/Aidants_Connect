@@ -4,7 +4,7 @@ from django.db import migrations
 
 
 def calculate_expiration_date_from_duree(apps, schema_editor):
-    Mandat = apps.get_model("aidants_connect_web", "Mandat")
+    Mandat = apps.get_model("web", "Mandat")
     for mandat in Mandat.objects.all():
         mandat.expiration_date = mandat.creation_date + timedelta(days=mandat.duree)
         mandat.save()
@@ -12,6 +12,6 @@ def calculate_expiration_date_from_duree(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0009_auto_20191119_1056")]
+    dependencies = [("web", "0009_auto_20191119_1056")]
 
     operations = [migrations.RunPython(calculate_expiration_date_from_duree)]

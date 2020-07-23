@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0035_add_autorisation_revocation_date"),
+        ("web", "0035_add_autorisation_revocation_date"),
     ]
 
     operations = [

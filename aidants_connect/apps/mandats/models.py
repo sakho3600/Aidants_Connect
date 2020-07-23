@@ -9,8 +9,6 @@ from django.utils.functional import cached_property
 
 from aidants_connect import constants
 
-from ..aidants.models import Organisation
-
 
 class AutorisationDureeKeywords(models.TextChoices):
     SHORT = (
@@ -28,6 +26,8 @@ class AutorisationDureeKeywords(models.TextChoices):
 
 
 def get_staff_organisation_name_id() -> int:
+    from ..aidants.models import Organisation  # avoid circular import
+
     try:
         return Organisation.objects.get(name=settings.STAFF_ORGANISATION_NAME).pk
     except Organisation.DoesNotExist:

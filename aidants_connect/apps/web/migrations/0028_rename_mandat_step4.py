@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0027_rename_mandat_step3"),
+        ("web", "0027_rename_mandat_step3"),
     ]
 
     operations = [
@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="usagers",
-                to="aidants_connect_web.Autorisation",
+                to="mandats.Autorisation",
             ),
         ),
     ]

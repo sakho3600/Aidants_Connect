@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0021_remote_mandat"),
+        ("web", "0021_remote_mandat"),
     ]
 
     operations = [

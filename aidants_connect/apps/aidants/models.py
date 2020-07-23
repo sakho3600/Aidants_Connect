@@ -2,10 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.functional import cached_property
 
-from ..logs.models import Journal
-from ..mandats.models import Autorisation
-from ..usagers.models import Usager
-
 
 class Organisation(models.Model):
     name = models.TextField("Nom", default="No name provided")
@@ -61,6 +57,8 @@ class Aidant(AbstractUser):
         :return: Autorisation object if this aidant may perform the specified `demarche`
         for the specified `usager`, `None` otherwise.`
         """
+        from ..mandats.models import Autorisation  # avoid circular import
+
         try:
             return (
                 Autorisation.objects.active()
@@ -77,6 +75,8 @@ class Aidant(AbstractUser):
         :return: a queryset of usagers who have at least one autorisation
         (active or expired) with the aidant's organisation.
         """
+        from ..usagers.models import Usager  # avoid circular import
+
         return Usager.objects.visible_by(self).distinct()
 
     def get_usager(self, usager_id):
@@ -84,6 +84,8 @@ class Aidant(AbstractUser):
         :return: an usager or `None` if the aidant isn't allowed
         by an autorisation to access this usager.
         """
+        from ..usagers.models import Usager  # avoid circular import
+
         try:
             return self.get_usagers().get(pk=usager_id)
         except Usager.DoesNotExist:
@@ -100,6 +102,8 @@ class Aidant(AbstractUser):
         """
         :return: a queryset of autorisations visible by this aidant.
         """
+        from ..mandats.models import Autorisation  # avoid circular import
+
         return Autorisation.objects.visible_by(self).distinct()
 
     def get_autorisation(self, autorisation_id):
@@ -107,6 +111,8 @@ class Aidant(AbstractUser):
         :return: an autorisation or `None` if this autorisation is not
         visible by this aidant.
         """
+        from ..mandats.models import Autorisation  # avoid circular import
+
         try:
             return self.get_autorisations().get(pk=autorisation_id)
         except Autorisation.DoesNotExist:
@@ -149,6 +155,8 @@ class Aidant(AbstractUser):
         """
         :return: the timestamp of this aidant's last logged action or `None`.
         """
+        from ..logs.models import Journal  # avoid circular import
+
         try:
             return (
                 Journal.objects.filter(initiator=self.full_string_identifier)
@@ -163,6 +171,8 @@ class Aidant(AbstractUser):
         :return: the corresponding 'create_attestation' Journal entry initiated
         by the aidant
         """
+        from ..logs.models import Journal  # avoid circular import
+
         journal_create_attestation = Journal.objects.filter(
             initiator=self.full_string_identifier,
             action="create_attestation",

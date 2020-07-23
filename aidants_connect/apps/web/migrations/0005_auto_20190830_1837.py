@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0004_one_mandat_per_demarche")]
+    dependencies = [("web", "0004_one_mandat_per_demarche")]
 
     operations = [
         migrations.AddField(

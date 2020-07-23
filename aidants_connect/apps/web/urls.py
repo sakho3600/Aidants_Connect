@@ -1,6 +1,6 @@
 from django.urls import path
 
-from aidants_connect_web.views import (
+from aidants_connect.apps.web.views import (
     FC_as_FS,
     id_provider,
     new_mandat,

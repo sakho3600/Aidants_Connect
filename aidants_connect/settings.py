@@ -90,11 +90,11 @@ INSTALLED_APPS = [
     "django_extensions",
 
     # project apps
-    "aidants_connect.apps.aidants",
+    "aidants_connect.apps.aidants.apps.AidantsConfig",
     "aidants_connect.apps.flexauth",  # flex·ible auth·entication
-    "aidants_connect.apps.logs",
-    "aidants_connect.apps.mandats",
-    "aidants_connect.apps.usagers",
+    "aidants_connect.apps.logs.apps.LogsConfig",
+    "aidants_connect.apps.mandats.apps.MandatsConfig",
+    "aidants_connect.apps.usagers.apps.UsagersConfig",
     "aidants_connect.apps.web",
 ]
 
@@ -259,7 +259,7 @@ ACTIVITY_CHECK_URL = "activity_check"
 ACTIVITY_CHECK_THRESHOLD = int(os.getenv("ACTIVITY_CHECK_THRESHOLD"))
 ACTIVITY_CHECK_DURATION = timedelta(minutes=ACTIVITY_CHECK_THRESHOLD)
 
-AUTH_USER_MODEL = "aidants_connect_web.Aidant"
+AUTH_USER_MODEL = "aidants.Aidant"
 
 MANDAT_TEMPLATE_PATH = (
     "templates/aidants_connect_web/mandat_templates/20200511_mandat.html"

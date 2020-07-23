@@ -6,7 +6,7 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0008_auto_20191021_1404")]
+    dependencies = [("web", "0008_auto_20191021_1404")]
 
     operations = [
         migrations.RenameField(

@@ -22,7 +22,7 @@ def _normalize_birthplace(usager):
 
 
 def normalize_birthplace(apps, schema_editor):
-    Usager = apps.get_model("aidants_connect_web", "Usager")
+    Usager = apps.get_model("web", "Usager")
     for usager in Usager.objects.all():
         _normalize_birthplace(usager)
 
@@ -30,7 +30,7 @@ def normalize_birthplace(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0018_add_journal_action_print_mandat"),
+        ("web", "0018_add_journal_action_print_mandat"),
     ]
 
     operations = [

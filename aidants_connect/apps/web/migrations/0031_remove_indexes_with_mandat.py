@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0030_rename_is_remote_mandat_field"),
+        ("web", "0030_rename_is_remote_mandat_field"),
     ]
 
     operations = [
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 default=0,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="autorisations",
-                to="aidants_connect_web.Usager",
+                to="usagers.Usager",
             ),
         ),
     ]

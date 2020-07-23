@@ -5,8 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from aidants_connect_web.decorators import activity_required
-from aidants_connect_web.models import Journal
+from ..decorators import activity_required
+
+from aidants_connect.apps.logs.models import Journal
 
 
 logging.basicConfig(level=logging.INFO)

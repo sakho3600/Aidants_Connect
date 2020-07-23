@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-from ..mandats.models import Autorisation, Mandat
-
 
 class UsagerQuerySet(models.QuerySet):
     def active(self):
@@ -65,12 +63,16 @@ class Usager(models.Model):
         return str(self)
 
     def get_mandat(self, mandat_id):
+        from ..mandats.models import Mandat  # avoid circular import
+
         try:
             return self.mandats.get(pk=mandat_id)
         except Mandat.DoesNotExist:
             return None
 
     def get_autorisation(self, mandat_id, autorisation_id):
+        from ..mandats.models import Autorisation  # avoid circular import
+
         try:
             return self.get_mandat(mandat_id).autorisations.get(pk=autorisation_id)
         except (AttributeError, Autorisation.DoesNotExist):

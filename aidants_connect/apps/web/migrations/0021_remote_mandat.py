@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0020_journal_action_add_update_email_usager"),
+        ("web", "0020_journal_action_add_update_email_usager"),
     ]
 
     operations = [

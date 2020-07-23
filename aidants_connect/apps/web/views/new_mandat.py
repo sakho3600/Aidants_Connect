@@ -1,23 +1,26 @@
 from datetime import date, timedelta
 import logging
 
+from django.conf import settings
 from django.contrib import messages as django_messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone, formats
-from django.http import HttpResponse
-from django.conf import settings
 
-from aidants_connect_web.decorators import activity_required
-from aidants_connect_web.forms import MandatForm, RecapMandatForm
-from aidants_connect_web.models import Autorisation, Connection, Journal, Mandat
-from aidants_connect_web.views.service import humanize_demarche_names
-from aidants_connect_web.utils import (
+from aidants_connect.apps.logs.models import Journal
+from aidants_connect.apps.mandats.forms import MandatForm, RecapMandatForm
+from aidants_connect.apps.mandats.models import Autorisation, Connection, Mandat
+
+from ..decorators import activity_required
+from ..utils import (
     generate_file_sha256_hash,
-    generate_sha256_hash,
     generate_qrcode_png,
+    generate_sha256_hash,
 )
+
+from .service import humanize_demarche_names
 
 
 logging.basicConfig(level=logging.INFO)

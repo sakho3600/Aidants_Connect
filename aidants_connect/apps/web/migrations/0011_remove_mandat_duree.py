@@ -5,6 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0010_auto_20191119_1105")]
+    dependencies = [("web", "0010_auto_20191119_1105")]
 
     operations = [migrations.RemoveField(model_name="mandat", name="duree")]

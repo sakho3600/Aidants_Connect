@@ -23,12 +23,13 @@ import jwt
 
 from aidants_connect import constants
 
-from aidants_connect_web.decorators import activity_required
-from aidants_connect_web.models import (
-    Connection,
-    Journal,
-    Usager,
-)
+from aidants_connect.apps.logs.models import Journal
+from aidants_connect.apps.mandats.models import Connection
+from aidants_connect.apps.usagers.models import Usager
+
+from ..decorators import activity_required
+from ..utils import generate_sha256_hash
+
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()

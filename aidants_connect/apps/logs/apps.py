@@ -2,7 +2,5 @@ from django.apps import AppConfig
 
 
 class LogsConfig(AppConfig):
-    name = "logs"
-
-    def ready(self):
-        from . import signals  # noqa
+    name = "aidants_connect.apps.logs"
+    verbose_name = "Aidants Connect — Journaux"  # the admin label

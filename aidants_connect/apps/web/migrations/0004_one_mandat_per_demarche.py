@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     replaces = [
-        ("aidants_connect_web", "0004_journal_mandat_id"),
-        ("aidants_connect_web", "0005_auto_20190827_1528"),
-        ("aidants_connect_web", "0006_connection_mandat"),
-        ("aidants_connect_web", "0007_auto_20190827_1630"),
+        ("web", "0004_journal_mandat_id"),
+        ("web", "0005_auto_20190827_1528"),
+        ("web", "0006_connection_mandat"),
+        ("web", "0007_auto_20190827_1630"),
     ]
 
-    dependencies = [("aidants_connect_web", "0003_auto_20190827_1432")]
+    dependencies = [("web", "0003_auto_20190827_1432")]
 
     operations = [
         migrations.AddField(
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to="aidants_connect_web.Mandat",
+                to="aidants_connect.mandats.Mandat",
             ),
         ),
         migrations.RemoveField(model_name="mandat", name="perimeter"),

@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [("aidants_connect_web", "0011_remove_mandat_duree")]
+    dependencies = [("web", "0011_remove_mandat_duree")]
 
     operations = [
         migrations.CreateModel(
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to="aidants_connect_web.Organisation",
+                to="aidants.Organisation",
             ),
         ),
         migrations.RemoveField(model_name="aidant", name="organisme"),

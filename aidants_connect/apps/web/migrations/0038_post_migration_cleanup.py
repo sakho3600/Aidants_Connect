@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("aidants_connect_web", "0037_auto_20200605_1658"),
+        ("web", "0037_auto_20200605_1658"),
     ]
 
     operations = [
@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
             model_name="mandat",
             name="usager",
             field=models.ForeignKey(
-                to="aidants_connect_web.Usager",
+                to="usagers.Usager",
                 related_name="mandats",
                 on_delete=django.db.models.deletion.PROTECT,
             ),
