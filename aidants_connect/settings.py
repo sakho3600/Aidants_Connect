@@ -15,7 +15,7 @@ import os
 
 from dotenv import load_dotenv
 
-from aidants_connect.utils import turn_psql_url_into_param
+from .utils import turn_psql_url_into_param
 
 
 load_dotenv(verbose=True)
@@ -44,7 +44,7 @@ else:
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+PROJECT_DIR = os.path.join(BASE_DIR, "aidants_connect")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -122,10 +122,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "aidants_connect.urls"
 
+TEMPLATES_DIR = os.path.join(PROJECT_DIR, "templates")
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [TEMPLATES_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -250,6 +251,10 @@ USE_TZ = True
 
 STATIC_ROOT = "staticfiles"
 STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [
+    os.path.join(PROJECT_DIR, "static"),
+]
 
 LOGIN_URL = "two_factor:login"
 LOGIN_REDIRECT_URL = "two_factor:profile"

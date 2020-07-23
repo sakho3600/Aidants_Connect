@@ -28,7 +28,6 @@ from aidants_connect.apps.mandats.models import Connection
 from aidants_connect.apps.usagers.models import Usager
 
 from ..decorators import activity_required
-from ..utils import generate_sha256_hash
 
 
 logging.basicConfig(level=logging.INFO)
@@ -115,7 +114,7 @@ def authorize(request):
 
         return render(
             request,
-            "aidants_connect_web/id_provider/authorize.html",
+            "web/id_provider/authorize.html",
             {
                 "connection_id": connection.id,
                 "usagers": aidant.get_usagers_with_active_autorisation(),
@@ -191,7 +190,7 @@ def fi_select_demarche(request):
 
         return render(
             request,
-            "aidants_connect_web/id_provider/fi_select_demarche.html",
+            "web/id_provider/fi_select_demarche.html",
             {
                 "connection_id": connection.id,
                 "aidant": request.user.get_full_name(),

@@ -23,7 +23,7 @@ def usagers_index(request):
 
     return render(
         request,
-        "aidants_connect_web/usagers.html",
+        "web/usagers.html",
         {"aidant": aidant, "usagers": usagers, "messages": messages},
     )
 
@@ -44,7 +44,7 @@ def usager_details(request, usager_id):
 
     return render(
         request,
-        "aidants_connect_web/usager_details.html",
+        "web/usager_details.html",
         {
             "aidant": aidant,
             "usager": usager,
@@ -97,7 +97,7 @@ def usagers_mandats_autorisations_cancel_confirm(
         else:
             return render(
                 request,
-                "aidants_connect_web/usagers_mandats_autorisations_cancel_confirm.html",
+                "web/usagers_mandats_autorisations_cancel_confirm.html",
                 {
                     "aidant": aidant,
                     "usager": usager,
@@ -108,6 +108,6 @@ def usagers_mandats_autorisations_cancel_confirm(
 
     return render(
         request,
-        "aidants_connect_web/usagers_mandats_autorisations_cancel_confirm.html",
+        "web/usagers_mandats_autorisations_cancel_confirm.html",
         {"aidant": aidant, "usager": usager, "autorisation": autorisation},
     )

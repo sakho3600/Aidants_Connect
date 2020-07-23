@@ -55,7 +55,7 @@ def dashboard(request):
     messages = django_messages.get_messages(request)
     return render(
         request,
-        "aidants_connect_web/dashboard.html",
+        "web/dashboard.html",
         {"aidant": aidant, "messages": messages},
     )
 
