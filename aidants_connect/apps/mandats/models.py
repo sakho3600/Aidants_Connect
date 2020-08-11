@@ -130,7 +130,10 @@ class Autorisation(models.Model):
 
     # Autorisation information
     mandat = models.ForeignKey(
-        Mandat, on_delete=models.CASCADE, related_name="autorisations", null=True
+        "mandats.Mandat",
+        on_delete=models.CASCADE,
+        related_name="autorisations",
+        null=True,
     )
     demarche = models.CharField(max_length=16, choices=DEMARCHE_CHOICES)
 
@@ -217,7 +220,7 @@ class Connection(models.Model):
     )
     complete = models.BooleanField(default=False)
     autorisation = models.ForeignKey(
-        Autorisation,
+        "mandats.Autorisation",
         blank=True,
         null=True,
         on_delete=models.CASCADE,

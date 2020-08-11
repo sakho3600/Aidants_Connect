@@ -1,0 +1,44 @@
+{% load static %}
+
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="fr">
+
+<head>
+
+  <title>{% block title %}Aidants Connect{% endblock %}</title>
+
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+  <link href="{% static 'css/template.min.css' %}" rel="stylesheet">
+
+  <!-- Extra styles -->
+  {% block extracss %}
+  {% endblock %}
+
+  {% include 'common/_head.html' %}
+
+</head>
+
+<body>
+
+  {% include 'common/_svg.html' %}
+
+  {% block nav %}
+    {% include 'common/_nav.html' %}
+  {% endblock nav %}
+
+  <main>
+  {% block content %}
+  {% endblock %}
+  </main>
+
+  {% block footer %}
+    {% include 'common/_footer.html' %}
+  {% endblock footer %}
+
+  <!-- Extra scripts -->
+  {% block extrajs %}
+  {% endblock %}
+
+</body>
+
+</html>

@@ -1,4 +1,5 @@
 {% load static %}
+
 <header class="navbar">
   <div class="navbar__container">
     <a class="navbar__home" href="{% url 'home_page' %}">
@@ -28,7 +29,7 @@
           <a class="button-outline secondary" href="{% url 'faq_generale' %}">FAQ</a>
         </li>
         <li class="nav__item">
-          <a class="button-outline primary button-filled" href="{% url 'two_factor:login' %}" >Se connecter</a>
+          <a class="button-outline primary button-filled" href="{% url 'two_factor:login' %}">Se connecter</a>
         </li>
       {% endif %}
       </ul>

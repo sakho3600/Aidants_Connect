@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.functional import cached_property
 
 
+
 class Organisation(models.Model):
     name = models.TextField("Nom", default="No name provided")
     siret = models.PositiveIntegerField("N° SIRET", default=1)
