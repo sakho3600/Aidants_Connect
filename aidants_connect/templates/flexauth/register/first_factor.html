@@ -1,0 +1,47 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block steptitle %}3/5 – Mode de connexion{% endblock %}
+
+{% block stepintro %}
+    <p>
+        Comment souhaitez-vous vous connecter au site Aidants Connect ?
+    </p>
+{% endblock %}
+
+{% block stepformfields %}
+
+    <div class="form__group">
+
+      {{ form.first_factor.label_tag }}
+
+      <ul>
+
+        {% for choice in form.first_factor %}
+          <li>
+            <label for="{{ choice.id_for_label }}">
+              <span class="radio">{{ choice.tag }}</span>
+              {{ choice.choice_label }}
+            </label>
+
+          {% comment %}
+            We want to display the password input fields under the relevant choice,
+            which means we need to access the choice value. This is not documented.
+            See: https://stackoverflow.com/questions/44765011
+          {% endcomment %}
+
+          {% if choice.data.value == 'password' %}
+            <div class="form__group form__extra" id="password_extra">
+              {{ form.password1.label_tag }}
+              {{ form.password1 }}
+              {{ form.password2.label_tag }}
+              {{ form.password2 }}
+            </div>
+          {% endif %}
+
+          </li>
+        {% endfor %}
+
+      </ul>
+    </div>
+
+{% endblock %}

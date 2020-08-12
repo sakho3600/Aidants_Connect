@@ -1,0 +1,17 @@
+{% extends 'flexauth/register/second_factor_validation.html' %}
+
+{% block stepintro %}
+    <p>Pour valider votre inscription, merci de suivre la procédure suivante :</p>
+    <ol>
+        <li>Installez une application d'authentification<br>
+            telle que <strong>FreeOTP</strong> ou <strong>Authy</strong> sur votre téléphone</li>
+        <li>Scannez le QR-code ci-dessous dans cette application</li>
+
+        <div id="qrcode">
+            <img width="200" height="200"
+                 src="{% url 'admin:otp_totp_totpdevice_qrcode' pk=new_aidant.totp_device.pk %}">
+        </div>
+
+        <li>Saisissez le code de sécurité généré ensuite par l'application :</li>
+    </ol>
+{% endblock %}

@@ -254,3 +254,19 @@ img.logo-height-5em {
     padding: 2em 0;
   }
 }
+
+
+/* Forms */
+
+
+.form__group ul {
+  list-style-type: none;
+}
+
+.form__extra {
+  display: none;
+  margin: 0 0 1em 0.5em;
+  padding: 0.5em 1.5em 1.5em 1.5em;
+  border: 1px #cccccc;
+  border-style: none none dashed dashed;
+}

@@ -37,9 +37,6 @@ admin.site.unregister(Group)
 # Unregister the Honeypot model
 admin.site.unregister(LoginAttempt)
 
-# Unregister the Django Two Factor Auth model
-admin.site.unregister(PhoneDevice)
-
 # Unregister the Django Celery Beat models
 admin.site.unregister(ClockedSchedule)
 admin.site.unregister(CrontabSchedule)

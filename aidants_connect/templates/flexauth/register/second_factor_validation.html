@@ -1,0 +1,9 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block steptitle %}5/5 – Validation{% endblock %}
+
+{% block stepformfields %}
+    <div class="form__group text-center">
+      {{ form.security_token }}
+    </div>
+{% endblock %}

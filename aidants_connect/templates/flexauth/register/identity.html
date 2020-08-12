@@ -1,0 +1,26 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block steptitle %}1/5 – Votre identité{% endblock %}
+
+{% block stepintro %}
+    <p>
+        Bienvenue sur Aidants Connect !<br>
+        Pour créer votre compte Aidant, nous avons besoin de quelques informations.<br>
+        Merci de remplir le formulaire ci-dessous&nbsp;:
+    </p>
+{% endblock %}
+
+{% block stepformfields %}
+    <div class="form__group">
+      {{ form.first_name.label_tag }}
+      {{ form.first_name }}
+    </div>
+    <div class="form__group">
+      {{ form.last_name.label_tag }}
+      {{ form.last_name }}
+    </div>
+    <div class="form__group">
+      {{ form.email.label_tag }}
+      {{ form.email }}
+    </div>
+{% endblock %}

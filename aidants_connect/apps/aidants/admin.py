@@ -44,9 +44,17 @@ class AidantAdmin(VisibleToStaff, DjangoUserAdmin):
     fieldsets = (
         (
             "Informations personnelles",
-            {"fields": ("username", "first_name", "last_name", "email", "password")},
+            {"fields": (
+                "username", "first_name", "last_name", "email", "password"
+            )},
         ),
-        ("Informations professionnelles", {"fields": ("profession", "organisation")}),
+        ("Informations professionnelles", {"fields": ("organisation", "profession")}),
+        (
+            "Authentification flexible",
+            {"fields": (
+                "has_completed_registration", "first_factor", "second_factor"
+            )},
+        ),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
     )
 

@@ -5,13 +5,13 @@ from django.db import models
 
 
 class FirstFactor(models.TextChoices):
-    PASSWORD = 'password', "Mot de passe"
-    EMAIL = 'email', "Lien envoyé par email"
-    MFS = 'mfs', "Compte Maisons France Services"  # maybe later...?
+    PASSWORD = 'password', "en tapant un mot de passe"
+    EMAIL = 'email', "en cliquant sur un lien reçu par email"
+    MFS = 'mfs', "en utilisant mon compte Maisons France Services"  # maybe later...?
 
 
 class SecondFactor(models.TextChoices):
-    SMS = 'sms', "Code envoyé par SMS"
-    CALL = 'call', "Code communiqué par appel téléphonique"
-    APP = 'app', "Application TOTP (ex: Authy...)"
-    KEY = 'key', "Clé de sécurité (ex: YubiKey...)"
+    SMS = 'sms', "en tapant un code reçu par SMS"
+    CALL = 'call', "en tapant un code reçu par appel téléphonique"
+    APP = 'app', "en utilisant une application mobile"
+    KEY = 'key', "en utilisant une clé de sécurité"

@@ -1,0 +1,49 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block steptitle %}4/5 – Connexion renforcée{% endblock %}
+
+{% block stepintro %}
+    <p>
+        <strong>Il est très important que votre identité soit garantie</strong> pendant que vous utilisez Aidants Connect.<br>
+        Nous vous proposons donc plusieurs méthodes différentes pour renforcer votre connexion.<br>
+        Merci d'en choisir une dans la liste ci-dessous :
+    </p>
+{% endblock %}
+
+{% block stepformfields %}
+
+    <div class="form__group">
+
+      {{ form.second_factor.label_tag }}
+
+      <ul>
+
+        {% for choice in form.second_factor %}
+          <li>
+            <label for="{{ choice.id_for_label }}">
+              <span class="radio">{{ choice.tag }}</span>
+              {{ choice.choice_label }}
+            </label>
+
+          {% if choice.data.value == 'sms' %}
+            <div class="form__group form__extra" id="sms_extra">
+              {{ form.phone_number_sms.label_tag }}
+              {{ form.phone_number_sms }}
+            </div>
+          {% endif %}
+
+          {% if choice.data.value == 'call' %}
+            <div class="form__group form__extra" id="call_extra">
+              {{ form.phone_number_call.label_tag }}
+              {{ form.phone_number_call }}
+            </div>
+          {% endif %}
+
+          </li>
+
+        {% endfor %}
+
+      </ul>
+    </div>
+
+{% endblock %}

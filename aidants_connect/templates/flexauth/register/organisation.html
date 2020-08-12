@@ -1,0 +1,16 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block steptitle %}2/5 – Votre organisation{% endblock %}
+
+{% block stepintro %}
+    <p>
+        Pour créer un compte Aidant, vous devez faire partie d'une organisation agréée.<br>
+        Merci de sélectionner votre organisation dans la liste ci-dessous&nbsp;:
+    </p>
+{% endblock %}
+
+{% block stepformfields %}
+    <div class="form__group text-center">
+      {{ form.organisation }}
+    </div>
+{% endblock %}

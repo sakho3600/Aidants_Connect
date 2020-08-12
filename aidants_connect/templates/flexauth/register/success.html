@@ -1,0 +1,10 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block steptitle %}Merci d'avoir créé votre compte Aidant !{% endblock %}
+
+{% block stepintro %}
+    <p>Vous pouvez maintenant <a href="{% url 'two_factor:login' %}">vous connecter</a>.</p>
+{% endblock %}
+
+{# No actual form on the last page #}
+{% block stepform %}{% endblock %}

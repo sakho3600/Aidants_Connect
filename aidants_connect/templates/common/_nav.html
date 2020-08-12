@@ -29,7 +29,10 @@
           <a class="button-outline secondary" href="{% url 'faq_generale' %}">FAQ</a>
         </li>
         <li class="nav__item">
-          <a class="button-outline primary button-filled" href="{% url 'two_factor:login' %}">Se connecter</a>
+          <a class="button-outline primary" href="{% url 'flexauth:register_identity' %}">S'inscrire</a>
+        </li>
+        <li class="nav__item">
+          <a class="button-outline primary" href="{% url 'two_factor:login' %}">Se connecter</a>
         </li>
       {% endif %}
       </ul>
