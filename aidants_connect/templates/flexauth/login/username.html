@@ -1,0 +1,15 @@
+{% extends 'flexauth/login/base.html' %}
+
+{% block steptitle %}1/3 – Votre adresse email{% endblock %}
+
+{% block stepintro %}
+    <p>
+        Pour vous connecter à votre compte Aidant, merci de saisir votre adresse email ci-dessous&nbsp;:
+    </p>
+{% endblock %}
+
+{% block stepformfields %}
+    <div class="form__group">
+      {{ form.username }}
+    </div>
+{% endblock %}

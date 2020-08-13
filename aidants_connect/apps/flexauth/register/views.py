@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from . import forms
 
 
-Aidant = get_user_model()
+User = get_user_model()
 
 TEMPLATES_PATH = 'flexauth/register'
 
@@ -13,8 +13,8 @@ def register_identity(request):
     if request.method == 'POST':
         form = forms.IdentityForm(request.POST)
         if form.is_valid():
-            new_aidant = form.save()
-            request.session['new_aidant_id'] = new_aidant.id
+            new_user = form.save()
+            request.session['new_user_id'] = new_user.id
             return redirect(request.POST.get('next'))
     else:
         form = forms.IdentityForm()
@@ -28,12 +28,12 @@ def register_identity(request):
 
 def register_organisation(request):
     try:
-        new_aidant = Aidant.objects.get(pk=request.session.get('new_aidant_id'))
-    except Aidant.DoesNotExist:
-        return redirect('flexauth:register_identity')
+        new_user = User.objects.get(pk=request.session.get('new_user_id'))
+    except User.DoesNotExist:
+        return redirect('flexauth:register')
 
     if request.method == 'POST':
-        form = forms.OrganisationForm(request.POST, instance=new_aidant)
+        form = forms.OrganisationForm(request.POST, instance=new_user)
         if form.is_valid():
             form.save()
             return redirect(request.POST.get('next'))
@@ -43,19 +43,20 @@ def register_organisation(request):
     template_name = "%s/%s.html" % (TEMPLATES_PATH, 'organisation')
     return render(request, template_name, {
         'form': form,
-        'prev': 'flexauth:register_identity',
+        'prev': 'flexauth:register',
         'next': 'flexauth:register_first_factor',
+        'new_user': new_user,
     })
 
 
 def register_first_factor(request):
     try:
-        new_aidant = Aidant.objects.get(pk=request.session.get('new_aidant_id'))
-    except Aidant.DoesNotExist:
-        return redirect('flexauth:register_identity')
+        new_user = User.objects.get(pk=request.session.get('new_user_id'))
+    except User.DoesNotExist:
+        return redirect('flexauth:register')
 
     if request.method == 'POST':
-        form = forms.FirstFactorForm(request.POST, instance=new_aidant)
+        form = forms.FirstFactorForm(request.POST, instance=new_user)
         if form.is_valid():
             form.save()
             return redirect(request.POST.get('next'))
@@ -67,17 +68,18 @@ def register_first_factor(request):
         'form': form,
         'prev': 'flexauth:register_organisation',
         'next': 'flexauth:register_second_factor',
+        'new_user': new_user,
     })
 
 
 def register_second_factor(request):
     try:
-        new_aidant = Aidant.objects.get(pk=request.session.get('new_aidant_id'))
-    except Aidant.DoesNotExist:
-        return redirect('flexauth:register_identity')
+        new_user = User.objects.get(pk=request.session.get('new_user_id'))
+    except User.DoesNotExist:
+        return redirect('flexauth:register')
 
     if request.method == 'POST':
-        form = forms.SecondFactorForm(request.POST, instance=new_aidant)
+        form = forms.SecondFactorForm(request.POST, instance=new_user)
         if form.is_valid():
             form.save()
             return redirect(request.POST.get('next'))
@@ -89,23 +91,24 @@ def register_second_factor(request):
         'form': form,
         'prev': 'flexauth:register_first_factor',
         'next': 'flexauth:validate_second_factor',
+        'new_user': new_user,
     })
 
 
 def validate_second_factor(request):
     try:
-        new_aidant = Aidant.objects.get(pk=request.session.get('new_aidant_id'))
-    except Aidant.DoesNotExist:
-        return redirect('flexauth:register_identity')
+        new_user = User.objects.get(pk=request.session.get('new_user_id'))
+    except User.DoesNotExist:
+        return redirect('flexauth:register')
 
     if request.method == 'POST':
         form = forms.SecondFactorValidationForm(request.POST)
         if form.is_valid():
-            form.save()
+            form.save(user=new_user)
 
-        new_aidant.has_completed_registration = True
-        new_aidant.is_active = True
-        new_aidant.save()
+        new_user.has_completed_registration = True
+        new_user.is_active = True
+        new_user.save()
         return redirect(request.POST.get('next'))
 
     else:
@@ -114,20 +117,20 @@ def validate_second_factor(request):
     template_name = "%s/%s_%s.html" % (
         TEMPLATES_PATH,
         'second_factor_validation',
-        new_aidant.second_factor,
+        new_user.second_factor,
     )
     return render(request, template_name, {
         'form': form,
         'prev': 'flexauth:register_second_factor',
-        'next': 'flexauth:success',
-        'new_aidant': new_aidant,
+        'next': 'flexauth:register_success',
+        'new_user': new_user,
     })
 
 def success(request):
     try:
-        new_aidant = Aidant.objects.get(pk=request.session.get('new_aidant_id'))
-    except Aidant.DoesNotExist:
-        return redirect('flexauth:register_identity')
+        new_user = User.objects.get(pk=request.session.get('new_user_id'))
+    except User.DoesNotExist:
+        return redirect('flexauth:register')
 
     template_name = "%s/%s.html" % (TEMPLATES_PATH, 'success')
     return render(request, template_name, {})

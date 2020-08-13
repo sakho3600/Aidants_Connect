@@ -195,5 +195,18 @@ class SecondFactorValidationForm(forms.Form):
             'autofocus': 'true'
         })
 
-    def save(self, *args, **kwargs):
-        pass
+    def save(self, user):
+        tfa_device = user.tfa_device
+        second_factor = user.second_factor
+
+        if second_factor in ('sms', 'call'):
+            pass
+
+        elif second_factor == 'app':
+            pass
+
+        elif second_factor == 'key':
+            tfa_device.public_id = self.cleaned_data['security_token'][:-32]
+            tfa_device.save()
+
+        return tfa_device

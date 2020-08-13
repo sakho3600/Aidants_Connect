@@ -6,9 +6,11 @@
       <img class="navbar__logo" src="{% static 'images/logo-marianne.svg' %}" alt="Logo République Française Marianne" />
       <img src="{% static 'images/aidants-connect_logo.png' %}" class="navbar__gouvfr" alt="Logo Aidants Connect" />
     </a>
+
     <nav role="navigation">
       <ul class="nav__links">
-      {% if request.user.is_authenticated %}
+      {% if request.user.is_authenticated and request.user.is_verified %}
+
         <li class="nav__item">
           <a class="button-outline secondary" href="{% url 'dashboard' %}">Espace Aidant</a>
         </li>
@@ -18,7 +20,9 @@
         <li class="nav__item">
           <a class="button-outline secondary" href="{% url 'logout' %}">Se déconnecter</a>
         </li>
+
       {% else %}
+
         <li class="nav__item">
           <a class="button-outline secondary" href="{% url 'home_page' %}">Accueil</a>
         </li>
@@ -29,11 +33,12 @@
           <a class="button-outline secondary" href="{% url 'faq_generale' %}">FAQ</a>
         </li>
         <li class="nav__item">
-          <a class="button-outline primary" href="{% url 'flexauth:register_identity' %}">S'inscrire</a>
+          <a class="button-outline primary" href="{% url 'flexauth:register' %}">S'inscrire</a>
         </li>
         <li class="nav__item">
-          <a class="button-outline primary" href="{% url 'two_factor:login' %}">Se connecter</a>
+          <a class="button-outline primary" href="{% url 'flexauth:login' %}">Se connecter</a>
         </li>
+
       {% endif %}
       </ul>
     </nav>

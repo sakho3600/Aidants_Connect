@@ -1,0 +1,14 @@
+{% extends 'flexauth/login/first_factor.html' %}
+
+{% block steptitle %}2/3 – Connexion par email{% endblock %}
+
+{% block stepintro %}
+    <p>
+        Nous vous avons envoyé un email.<br>
+        Pour vous connecter, merci de cliquer sur le lien contenu dans ce message.<br>
+        Si vous ne l'avez pas reçu, vous pouvez <a href="javascript:alert('TODO')">cliquer ici</a> pour en recevoir un nouveau.
+    </p>
+{% endblock %}
+
+{# No actual form in this case #}
+{% block stepform %}{% endblock %}

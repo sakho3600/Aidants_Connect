@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extracss %}
+  <link href="{% static 'css/home.css' %}" rel="stylesheet">
+{% endblock extracss %}
+
+{% block content %}
+  <section class="section">
+    <div class="container">
+
+      <div class="text-center">
+        <h1>Connexion Aidants Connect</h1>
+        <h4>{% block steptitle %}{% endblock %}</h4>
+      </div>
+
+      <div class="text-center">
+        {% block stepintro %}{% endblock %}
+      </div>
+
+      <div>
+        {% block stepform %}
+          <form method="post">
+
+            {% block stepformfields %}{% endblock %}
+
+            <div class="form__group text-center">
+
+              {% if prev %}
+                <a href="{% url prev %}">
+                  <input type="button" class="button" value="&larr; Étape précédente">
+                </a>
+              {% endif %}
+
+              <input type="submit" class="button" value="Étape suivante &rarr;">
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+            {% csrf_token %}
+
+          </form>
+        {% endblock %}
+      </div>
+
+    </div>
+  </section>
+
+{% endblock content %}

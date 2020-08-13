@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from ..decorators import activity_required
+from django_otp.decorators import otp_required
 
 from aidants_connect.apps.logs.models import Journal
 
@@ -14,8 +14,8 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
 
 
+@otp_required
 @login_required
-@activity_required
 def usagers_index(request):
     messages = django_messages.get_messages(request)
     aidant = request.user
@@ -28,8 +28,8 @@ def usagers_index(request):
     )
 
 
+@otp_required
 @login_required
-@activity_required
 def usager_details(request, usager_id):
     messages = django_messages.get_messages(request)
     aidant = request.user
@@ -55,8 +55,8 @@ def usager_details(request, usager_id):
     )
 
 
+@otp_required
 @login_required
-@activity_required
 def usagers_mandats_autorisations_cancel_confirm(
     request, usager_id, mandat_id, autorisation_id
 ):

@@ -119,6 +119,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "django_referrer_policy.middleware.ReferrerPolicyMiddleware",
+
+    # Disabled during prototype dev decrease JS dev friction
     # "csp.middleware.CSPMiddleware",
 ]
 
@@ -191,7 +193,7 @@ AUTHENTICATION_BACKENDS = [
 SESAME_ONE_TIME = True
 SESAME_MAX_AGE = int(os.getenv("SESAME_MAX_AGE", 60 * 10))  # default: 10 mn
 
-TWO_FACTOR_PATCH_ADMIN = True
+TWO_FACTOR_PATCH_ADMIN = False
 
 TFA_GATEWAY_FAKE = "two_factor.gateways.fake.Fake"
 TFA_GATEWAY_TWILIO = "two_factor.gateways.twilio.gateway.Twilio"
@@ -258,9 +260,10 @@ STATICFILES_DIRS = [
     os.path.join(PROJECT_DIR, "static"),
 ]
 
-LOGIN_URL = "two_factor:login"
-LOGIN_REDIRECT_URL = "two_factor:profile"
+LOGIN_URL = "flexauth:login"
+LOGIN_REDIRECT_URL = "usagers"
 LOGOUT_REDIRECT_URL = "home_page"
+OTP_LOGIN_URL = LOGIN_URL
 
 ACTIVITY_CHECK_URL = "activity_check"
 ACTIVITY_CHECK_THRESHOLD = int(os.getenv("ACTIVITY_CHECK_THRESHOLD"))
@@ -378,81 +381,6 @@ SHELL_PLUS_IMPORTS = [
     "from datetime import datetime, timedelta",
 ]
 
-
-
-
-
-
-
-DEMARCHES = {
-    "papiers": {
-        "titre": "Papiers - Citoyenneté",
-        "description": "État-civil, Passeport, Élections, Papiers à conserver, Carte d'identité…",
-        "service_exemples": ["ANTS", "Défenseur des droits"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png/papiers.png",
-    },
-    "famille": {
-        "titre": "Famille",
-        "description": "Allocations familiales, Naissance, Mariage, Pacs, Scolarité…",
-        "service_exemples": ["CAF", "ameli.fr", "EduConnect"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/famille.png",
-    },
-    "social": {
-        "titre": "Social - Santé",
-        "description": "Carte vitale, Chômage, Handicap, RSA, Personnes âgées…",
-        "service_exemples": ["ameli.fr", "MSA", "RSI"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/sante.png",
-    },
-    "travail": {
-        "titre": "Travail",
-        "description": "CDD, Concours, Retraite, Démission, Période d'essai…",
-        "service_exemples": ["Pôle emploi", "Mon compte formation", "info-retraite.fr"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/travail.png",
-    },
-    "logement": {
-        "titre": "Logement",
-        "description": "Allocations logement, Permis de construire, Logement social, Fin de bail…",
-        "service_exemples": ["CAF", "Enedis"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/logement.png",
-    },
-    "transports": {
-        "titre": "Transports",
-        "description": "Carte grise, Permis de conduire, Contrôle technique, Infractions…",
-        "service_exemples": ["ANTS", "ANTAI", "Crit'air"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/transports.png",
-    },
-    "argent": {
-        "titre": "Argent",
-        "description": "Crédit immobilier, Impôts, Consommation, Livret A, Assurance, "
-        "Surendettement…",
-        "service_exemples": ["Impots.gouv", "Timbres fiscaux", "Banque"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/argent.png",
-    },
-    "justice": {
-        "titre": "Justice",
-        "description": "Casier judiciaire, Plainte, Aide juridictionnelle, Saisie…",
-        "service_exemples": ["Télérecours citoyens"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/justice.png",
-    },
-    "etranger": {
-        "titre": "Étranger",
-        "description": "Titres de séjour, Attestation d’accueil, Regroupement familial…",
-        "service_exemples": ["OFPRA"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/etrangers.png",
-    },
-    "loisirs": {
-        "titre": "Loisirs",
-        "description": "Animaux, Permis bateau, Tourisme, Permis de chasser…",
-        "service_exemples": ["Ariane"],
-        "icon": "https://www.service-public.fr/resources/v-5cf79a7acf/web/css/img/png"
-        "/loisirs.png",
-    },
-}
+# FlexAuth
+FLEXAUTH_DEFAULT_1AF = os.getenv('FLEXAUTH_DEFAULT_1AF', 'email')
+FLEXAUTH_DEFAULT_2AF = os.getenv('FLEXAUTH_DEFAULT_2AF', 'app')

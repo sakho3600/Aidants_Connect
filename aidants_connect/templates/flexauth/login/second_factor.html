@@ -1,0 +1,9 @@
+{% extends 'flexauth/login/base.html' %}
+
+{% block steptitle %}3/3 – Connexion renforcée{% endblock %}
+
+{% block stepformfields %}
+    <div class="form__group">
+      {{ form.second_factor }}
+    </div>
+{% endblock %}

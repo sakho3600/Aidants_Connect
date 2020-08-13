@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 from django_otp.plugins.otp_totp.models import TOTPDevice
@@ -6,6 +7,7 @@ from two_factor.models import PhoneDevice
 
 
 from . import constants
+from .login import forms as login_forms
 
 
 class WithFlexAuth(models.Model):
@@ -30,12 +32,21 @@ class WithFlexAuth(models.Model):
         abstract = True
 
     @property
-    def totp_device(self):
-        return TOTPDevice.objects.filter(user=self).first()
+    def tfa_device(self):
+        if self.second_factor in ('sms', 'call'):
+            return self.phone_device
+        elif self.second_factor == 'app':
+            return self.totp_device
+        elif self.second_factor == 'key':
+            return self.yubikey_device
 
     @property
     def phone_device(self):
         return PhoneDevice.objects.filter(user=self).first()
+
+    @property
+    def totp_device(self):
+        return TOTPDevice.objects.filter(user=self).first()
 
     @property
     def yubikey_device(self):
