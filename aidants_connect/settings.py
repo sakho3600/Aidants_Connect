@@ -107,9 +107,11 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+
+    # Include for "Magic Link" auth
     "sesame.middleware.AuthenticationMiddleware",
 
-    # Always include for two-factor auth
+    # Include for two-factor auth
     "django_otp.middleware.OTPMiddleware",
 
     # Include for Twilio gateway
@@ -181,46 +183,6 @@ else:
 
 if ssl_option:
     DATABASES["default"]["OPTIONS"] = {"sslmode": ssl_option}
-
-
-# Authentication
-
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "sesame.backends.ModelBackend",
-]
-
-SESAME_ONE_TIME = True
-SESAME_MAX_AGE = int(os.getenv("SESAME_MAX_AGE", 60 * 10))  # default: 10 mn
-
-TWO_FACTOR_PATCH_ADMIN = False
-
-TFA_GATEWAY_FAKE = "two_factor.gateways.fake.Fake"
-TFA_GATEWAY_TWILIO = "two_factor.gateways.twilio.gateway.Twilio"
-
-ENABLE_2FA_APP = (
-    True if os.getenv("ENABLE_2FA_APP") == "True" else False
-)
-
-ENABLE_2FA_SMS = (
-    True if os.getenv("ENABLE_2FA_SMS") == "True" else False
-)
-TWO_FACTOR_SMS_GATEWAY = TFA_GATEWAY_TWILIO if ENABLE_2FA_SMS else TFA_GATEWAY_FAKE
-
-ENABLE_2FA_CALL = (
-    True if os.getenv("ENABLE_2FA_CALL") == "True" else False
-)
-TWO_FACTOR_CALL_GATEWAY = TFA_GATEWAY_TWILIO if ENABLE_2FA_CALL else TFA_GATEWAY_FAKE
-
-ENABLE_2FA_KEY = (
-    True if os.getenv("ENABLE_2FA_KEY") == "True" else False
-)
-
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
-TWILIO_CALLER_ID = os.getenv("TWILIO_CALLER_ID", "")
-
-PHONENUMBER_DEFAULT_REGION = "FR"
 
 
 # Password validation
@@ -382,5 +344,29 @@ SHELL_PLUS_IMPORTS = [
 ]
 
 # FlexAuth
-FLEXAUTH_DEFAULT_1AF = os.getenv('FLEXAUTH_DEFAULT_1AF', 'email')
+FLEXAUTH_AVAILABLE_1AF = os.getenv('FLEXAUTH_AVAILABLE_1AF', 'password,email').split(ENV_SEPARATOR)
+FLEXAUTH_AVAILABLE_2AF = os.getenv('FLEXAUTH_AVAILABLE_2AF', 'app,sms,call,key').split(ENV_SEPARATOR)
+FLEXAUTH_DEFAULT_1AF = os.getenv('FLEXAUTH_DEFAULT_1AF', 'password')
 FLEXAUTH_DEFAULT_2AF = os.getenv('FLEXAUTH_DEFAULT_2AF', 'app')
+FLEXAUTH_BASE_URL = os.getenv('FLEXAUTH_BASE_URL', 'https://%s' % HOST)
+
+SESAME_ONE_TIME = True
+SESAME_MAX_AGE = int(os.getenv("SESAME_MAX_AGE", 60 * 15))  # default: 15 mn
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "sesame.backends.ModelBackend",
+]
+
+TWO_FACTOR_GATEWAY_FAKE = "two_factor.gateways.fake.Fake"
+TWO_FACTOR_GATEWAY_TWILIO = "two_factor.gateways.twilio.gateway.Twilio"
+TWO_FACTOR_SMS_GATEWAY = TWO_FACTOR_GATEWAY_TWILIO if 'sms' in FLEXAUTH_AVAILABLE_2AF else TWO_FACTOR_GATEWAY_FAKE
+TWO_FACTOR_CALL_GATEWAY = TWO_FACTOR_GATEWAY_TWILIO if 'call' in FLEXAUTH_AVAILABLE_2AF else TWO_FACTOR_GATEWAY_FAKE
+TWO_FACTOR_PATCH_ADMIN = (
+    True if os.getenv("TWO_FACTOR_PATCH_ADMIN") == "True" else False
+)
+
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_CALLER_ID = os.getenv("TWILIO_CALLER_ID", "")
+
+PHONENUMBER_DEFAULT_REGION = os.getenv("PHONENUMBER_DEFAULT_REGION", "FR")

@@ -16,7 +16,19 @@ def login_username(request):
     if request.method == 'POST':
         form = form_class(request.POST)
         if form.is_valid():
-            request.session['username'] = request.POST.get('username')
+
+            username = request.POST.get('username')
+            first_factor = settings.FLEXAUTH_DEFAULT_1AF
+            try:
+                user = User.objects.get(username=username, is_active=True)
+            except User.DoesNotExist:
+                user = None
+            else:
+                first_factor = user.first_factor or first_factor
+                if first_factor == 'email':
+                    user.send_sesame()
+
+            request.session['username'] = username
             return redirect(request.POST.get('next'))
     else:
         form = form_class()
@@ -47,6 +59,11 @@ def login_first_factor(request):
         form = form_class(request.POST)
         if user and form.is_valid():
             if form.authenticate(request, username):
+
+                if user.second_factor in ('sms', 'call'):
+                    phone = user.phone_device
+                    phone.generate_challenge()
+
                 return redirect(request.POST.get('next'))
     else:
         form = form_class()

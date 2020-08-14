@@ -20,6 +20,15 @@
       </div>
 
       <div>
+
+        {% if form.errors %}
+          <div class="notification error closable full-width" role="alert">
+          {% for _, message in form.errors.items %}
+            {{ message }}
+          {% endfor %}
+          </div>
+        {% endif %}
+
         {% block stepform %}
           <form method="post">
 

@@ -158,17 +158,22 @@ class SecondFactorForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
-        new_aidant = super().save(commit=commit)
+        new_user = super().save(commit=commit)
 
+        # We check the selected second factor.
         second_factor = self.cleaned_data['second_factor']
 
+        # We record the adequate OTP device (phone, app, yubikey)...
         if second_factor in ('sms', 'call'):
-            PhoneDevice.objects.create(
-                user=new_aidant,
+            phone = PhoneDevice.objects.create(
+                user=new_user,
                 name='default',
                 method=second_factor,
                 number=self.cleaned_data['phone_number_%s' % second_factor]
             )
+
+            # ... and immediately request a token for the next page.
+            phone.generate_challenge()
 
         elif second_factor == 'app':
             TOTPDevice.objects.create(
@@ -183,30 +188,43 @@ class SecondFactorForm(forms.ModelForm):
                 service=ValidationService.objects.get(name='default'),
             )
 
-        return new_aidant
+        return new_user
 
 
 class SecondFactorValidationForm(forms.Form):
     security_token = forms.CharField(label="Jeton de sécurité")
 
     def __init__(self, *args, **kwargs):
+
+        # We need to keep track of the current user and their second factor.
+        self.user = kwargs.pop('user', None)
+        self.second_factor = getattr(self.user, 'second_factor', None)
+
         super().__init__(*args, **kwargs)
         self.fields['security_token'].widget.attrs.update({
             'autofocus': 'true'
         })
 
-    def save(self, user):
-        tfa_device = user.tfa_device
-        second_factor = user.second_factor
+    def clean(self):
+        cleaned_data = super().clean()
 
-        if second_factor in ('sms', 'call'):
-            pass
+        if self.second_factor in ('sms', 'call'):
+            phone = self.user.phone_device
+            if not phone.verify_token(cleaned_data['security_token']):
+                raise forms.ValidationError("Le code saisi est incorrect.")
 
-        elif second_factor == 'app':
-            pass
+        return cleaned_data
 
-        elif second_factor == 'key':
-            tfa_device.public_id = self.cleaned_data['security_token'][:-32]
-            tfa_device.save()
+    def save(self):
 
-        return tfa_device
+        # We record the YubiKey ID...
+        if self.second_factor == 'key':
+            yubikey = self.user.yubikey_device
+            yubikey.public_id = self.cleaned_data['security_token'][:-32]
+            yubikey.save()
+
+        # ... and mark the user as having completed their registration.
+        if self.user:
+            self.user.has_completed_registration = True
+            self.user.is_active = True
+            self.user.save()

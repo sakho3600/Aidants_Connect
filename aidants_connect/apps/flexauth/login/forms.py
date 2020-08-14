@@ -107,19 +107,34 @@ class BaseSecondFactorForm(forms.Form):
 
 
 class AppSecondFactorForm(BaseSecondFactorForm):
+    def authenticate(self, request):
+        user = request.user
+        totp = user.totp_device
+        token = self.cleaned_data['second_factor']
+        if totp.verify_token(token):
+            otp_login(request, totp)
+            return True
+
+
+class PhoneDeviceSecondFactorForm(BaseSecondFactorForm):
+    def authenticate(self, request):
+        user = request.user
+        phone = user.phone_device
+        token = self.cleaned_data['second_factor']
+        if phone.verify_token(token):
+            otp_login(request, phone)
+            return True
+
+
+class SmsSecondFactorForm(PhoneDeviceSecondFactorForm):
     pass
 
 
-class SmsSecondFactorForm(BaseSecondFactorForm):
-    pass
-
-
-class CallSecondFactorForm(BaseSecondFactorForm):
+class CallSecondFactorForm(PhoneDeviceSecondFactorForm):
     pass
 
 
 class KeySecondFactorForm(BaseSecondFactorForm):
-
     def authenticate(self, request):
         user = request.user
         yubikey = user.yubikey_device

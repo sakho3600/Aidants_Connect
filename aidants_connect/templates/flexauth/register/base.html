@@ -15,11 +15,20 @@
         <h4>{% block steptitle %}{% endblock %}</h4>
       </div>
 
+      {% if form.errors %}
+        <div class="notification error closable full-width" role="alert">
+        {% for _, message in form.errors.items %}
+          {{ message }}
+        {% endfor %}
+        </div>
+      {% endif %}
+
       <div class="text-center">
         {% block stepintro %}{% endblock %}
       </div>
 
       <div>
+
         {% block stepform %}
           <form method="post">
 

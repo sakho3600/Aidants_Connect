@@ -7,13 +7,6 @@
 {% endblock extracss %}
 
 {% block content %}
-{% if messages %}
-  <div class="notification success closable full-width" role="alert">
-    {% for message in messages %}
-      {{ message }}
-    {% endfor %}
-  </div>
-{% endif %}
 <div class="hero">
   <div class="hero__container">
     <img class="logo-height-5em" src="{% static 'images/aidants-connect_logo.png' %}" alt="Logo Aidants Connect" />

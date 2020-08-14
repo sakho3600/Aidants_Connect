@@ -27,6 +27,15 @@
   {% endblock nav %}
 
   <main>
+
+  {% if messages %}
+    <div class="notification success closable full-width" role="alert">
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {% block content %}
   {% endblock %}
   </main>

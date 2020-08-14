@@ -1,6 +1,6 @@
-Bonjour {{ user.first_name }} {{ user.last_name }},
+Bonjour {{ user.first_name }},
 
-Pour accéder à {{ site.domain }}, vous avez juste à cliquer sur ce lien de connexion: https://{{ site.domain }}?next={{ next_view }}
+Pour accéder à {{ site.domain }}, il vous suffit de cliquer sur ce lien de connexion : https://{{ site.domain }}?sesame={{ sesame }}
 
 Ce lien n'est valable que {{ TOKEN_DURATION_MINUTES }} minutes. Il est à usage unique.
 

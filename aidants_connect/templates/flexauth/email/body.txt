@@ -1,0 +1,9 @@
+Bonjour {{ user.first_name }},
+
+Pour accéder à {{ site.domain }}, il vous suffit de cliquer sur ce lien de connexion : {{ sesame_url }}
+
+Ce lien n'est valable que {{ sesame_ttl_minutes }} minutes. Il est à usage unique.
+
+Bonne journée,
+
+L'équipe {{ site.domain }}

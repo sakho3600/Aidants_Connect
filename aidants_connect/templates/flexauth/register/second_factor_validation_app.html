@@ -9,7 +9,7 @@
 
         <div id="qrcode">
             <img width="200" height="200"
-                 src="{% url 'admin:otp_totp_totpdevice_qrcode' pk=new_aidant.totp_device.pk %}">
+                 src="{% url 'flexauth:generate_totp_qrcode' totp_device_id=new_user.totp_device.id %}">
         </div>
 
         <li>Saisissez le code de sécurité généré ensuite par l'application :</li>

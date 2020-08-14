@@ -1,5 +1,10 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model, login
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
+
+from django_otp.plugins.otp_totp.models import TOTPDevice
+import qrcode
+import qrcode.image.svg
 
 from . import forms
 
@@ -102,14 +107,10 @@ def validate_second_factor(request):
         return redirect('flexauth:register')
 
     if request.method == 'POST':
-        form = forms.SecondFactorValidationForm(request.POST)
+        form = forms.SecondFactorValidationForm(request.POST, user=new_user)
         if form.is_valid():
-            form.save(user=new_user)
-
-        new_user.has_completed_registration = True
-        new_user.is_active = True
-        new_user.save()
-        return redirect(request.POST.get('next'))
+            form.save()
+            return redirect(request.POST.get('next'))
 
     else:
         form = forms.SecondFactorValidationForm()
@@ -126,6 +127,15 @@ def validate_second_factor(request):
         'new_user': new_user,
     })
 
+
+def generate_totp_qrcode(request, totp_device_id):
+    totp_device = TOTPDevice.objects.get(pk=totp_device_id)
+    response = HttpResponse(content_type='image/svg+xml')
+    img = qrcode.make(totp_device.config_url, image_factory=qrcode.image.svg.SvgImage)
+    img.save(response)
+    return response
+
+
 def success(request):
     try:
         new_user = User.objects.get(pk=request.session.get('new_user_id'))
@@ -134,3 +144,5 @@ def success(request):
 
     template_name = "%s/%s.html" % (TEMPLATES_PATH, 'success')
     return render(request, template_name, {})
+
+
