@@ -1,0 +1,14 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block stepname %}Connexion par email{% endblock %}
+
+{% block stepintro %}
+  <p>
+    Quand vous voudrez vous connecter, nous vous enverrons un email contenant un lien de connexion.<br>
+    Pas besoin de retenir un mot de passe, c'est plus simple et tout aussi sûr ! 👍
+  </p>
+{% endblock %}
+
+{% block stepformfields %}
+    <input type="hidden" name="first_factor" value="email">
+{% endblock %}

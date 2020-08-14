@@ -5,13 +5,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 
 from django_otp import login as otp_login
-from django_otp.plugins.otp_totp.models import TOTPDevice
-from otp_yubikey.models import RemoteYubikeyDevice, ValidationService
-from phonenumber_field.formfields import PhoneNumberField
-from two_factor.models import PhoneDevice
-
-
-from .. import constants
 
 
 def _get_login_form_class(form_class_name):
@@ -102,43 +95,56 @@ class BaseSecondFactorForm(forms.Form):
             'autofocus': 'true'
         })
 
-    def authenticate(self, request):
+    def _get_otp_user(self, request):
+        return request.user
+
+    def _get_otp_device(self, request):
         return NotImplementedError
+
+    def _get_otp_token(self):
+        return self.cleaned_data['second_factor']
+
+    def generate_challenge(self):
+        pass  # noop if no challenge is required with this method
+
+    def validate(self, request):
+        otp_device = self._get_otp_device(request)
+        if not otp_device:
+            raise ValueError("No validation device found.")
+        otp_token = self._get_otp_token(request)
+        if not otp_token:
+            raise ValueError("No validation token found.")
+
+        if otp_device.verify_token(otp_token):
+            return True
+
+    def authenticate(self, request):
+        if self.validate(request):
+            otp_login(self.otp_device)
+            return True
 
 
 class AppSecondFactorForm(BaseSecondFactorForm):
-    def authenticate(self, request):
-        user = request.user
-        totp = user.totp_device
-        token = self.cleaned_data['second_factor']
-        if totp.verify_token(token):
-            otp_login(request, totp)
-            return True
+    def _get_otp_device(self, request):
+        return self._get_otp_user(request).totp_device
+
+
+class KeySecondFactorForm(BaseSecondFactorForm):
+    def _get_otp_device(self, request):
+        return self._get_otp_user(request).yubikey_device
 
 
 class PhoneDeviceSecondFactorForm(BaseSecondFactorForm):
-    def authenticate(self, request):
-        user = request.user
-        phone = user.phone_device
-        token = self.cleaned_data['second_factor']
-        if phone.verify_token(token):
-            otp_login(request, phone)
-            return True
+    def _get_otp_device(self, request):
+        return self._get_otp_user(request).phone_device
 
-
-class SmsSecondFactorForm(PhoneDeviceSecondFactorForm):
-    pass
+    def generate_challenge(self, request):
+        self._get_otp_device(request).generate_challenge()
 
 
 class CallSecondFactorForm(PhoneDeviceSecondFactorForm):
     pass
 
 
-class KeySecondFactorForm(BaseSecondFactorForm):
-    def authenticate(self, request):
-        user = request.user
-        yubikey = user.yubikey_device
-        token = self.cleaned_data['second_factor']
-        if yubikey.verify_token(token):
-            otp_login(request, yubikey)
-            return True
+class SmsSecondFactorForm(PhoneDeviceSecondFactorForm):
+    pass

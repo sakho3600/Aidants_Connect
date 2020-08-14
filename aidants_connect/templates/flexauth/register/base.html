@@ -12,7 +12,11 @@
 
       <div class="text-center">
         <h1>Inscription Aidants Connect</h1>
-        <h4>{% block steptitle %}{% endblock %}</h4>
+        <h4>
+          {% block steptitle %}
+            {{ step_number }}/5 – {% block stepname %}{% endblock %}
+          {% endblock %}
+        </h4>
       </div>
 
       {% if form.errors %}

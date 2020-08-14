@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, get_user_model, login
+from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
@@ -6,6 +6,7 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 import qrcode
 import qrcode.image.svg
 
+from .. import constants
 from . import forms
 
 
@@ -28,6 +29,7 @@ def register_identity(request):
     return render(request, template_name, {
         'form': form,
         'next': 'flexauth:register_organisation',
+        'step_number': 1,
     })
 
 
@@ -51,6 +53,7 @@ def register_organisation(request):
         'prev': 'flexauth:register',
         'next': 'flexauth:register_first_factor',
         'new_user': new_user,
+        'step_number': 2,
     })
 
 
@@ -68,12 +71,19 @@ def register_first_factor(request):
     else:
         form = forms.FirstFactorForm()
 
-    template_name = "%s/%s.html" % (TEMPLATES_PATH, 'first_factor')
+    template_base_name = 'first_factor'
+    if constants.NUM_AVAILABLE_FIRST_FACTORS == 1:
+        template_base_name = '%s_only_%s' % (
+            template_base_name, constants.AVAILABLE_FIRST_FACTORS[0]
+        )
+    template_name = "%s/%s.html" % (TEMPLATES_PATH, template_base_name)
+
     return render(request, template_name, {
         'form': form,
         'prev': 'flexauth:register_organisation',
         'next': 'flexauth:register_second_factor',
         'new_user': new_user,
+        'step_number': 3,
     })
 
 
@@ -91,12 +101,19 @@ def register_second_factor(request):
     else:
         form = forms.SecondFactorForm()
 
-    template_name = "%s/%s.html" % (TEMPLATES_PATH, 'second_factor')
+    template_base_name = 'second_factor'
+    if constants.NUM_AVAILABLE_SECOND_FACTORS == 1:
+        template_base_name = '%s_only_%s' % (
+            template_base_name, constants.AVAILABLE_SECOND_FACTORS[0]
+        )
+    template_name = "%s/%s.html" % (TEMPLATES_PATH, template_base_name)
+
     return render(request, template_name, {
         'form': form,
         'prev': 'flexauth:register_first_factor',
         'next': 'flexauth:validate_second_factor',
         'new_user': new_user,
+        'step_number': 4,
     })
 
 
@@ -125,6 +142,7 @@ def validate_second_factor(request):
         'prev': 'flexauth:register_second_factor',
         'next': 'flexauth:register_success',
         'new_user': new_user,
+        'step_number': 5,
     })
 
 
@@ -138,11 +156,9 @@ def generate_totp_qrcode(request, totp_device_id):
 
 def success(request):
     try:
-        new_user = User.objects.get(pk=request.session.get('new_user_id'))
+        User.objects.get(pk=request.session.get('new_user_id'))
     except User.DoesNotExist:
         return redirect('flexauth:register')
 
     template_name = "%s/%s.html" % (TEMPLATES_PATH, 'success')
     return render(request, template_name, {})
-
-

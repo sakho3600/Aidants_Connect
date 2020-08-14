@@ -9,7 +9,6 @@ from django_celery_beat.models import (
     PeriodicTask,
     SolarSchedule,
 )
-from two_factor.models import PhoneDevice
 
 
 class VisibleToStaff:

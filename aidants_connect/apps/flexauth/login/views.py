@@ -59,11 +59,7 @@ def login_first_factor(request):
         form = form_class(request.POST)
         if user and form.is_valid():
             if form.authenticate(request, username):
-
-                if user.second_factor in ('sms', 'call'):
-                    phone = user.phone_device
-                    phone.generate_challenge()
-
+                form.generate_challenge()
                 return redirect(request.POST.get('next'))
     else:
         form = form_class()

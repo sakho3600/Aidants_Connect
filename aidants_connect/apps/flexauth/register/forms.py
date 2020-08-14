@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from otp_yubikey.models import RemoteYubikeyDevice, ValidationService
@@ -35,10 +35,32 @@ class IdentityForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+
+        try:
+            Aidant.objects.get(
+                username=cleaned_data['email'],
+                has_completed_registration=True,
+            )
+        except Aidant.DoesNotExist:
+            pass
+        else:
+            raise forms.ValidationError("Ce compte utilisateur existe déjà.")
+
         return cleaned_data
 
     def save(self, commit=True):
-        new_aidant = super().save(commit=False)
+        try:
+            new_aidant = super().save(commit=False)
+        except IntegrityError:
+
+            # Maybe this user hasn't completed their registration and is coming back?
+            try:
+                new_aidant = Aidant.objects.get(
+                    username=self.cleaned_data['email'],
+                    has_completed_registration=False,
+                )
+            except Aidant.DoesNotExist:
+                raise
 
         new_aidant.username = new_aidant.email
         new_aidant.set_unusable_password()
@@ -46,6 +68,7 @@ class IdentityForm(forms.ModelForm):
         new_aidant = super().save(commit=commit)
 
         return new_aidant
+
 
 class OrganisationForm(forms.ModelForm):
     organisation = forms.ModelChoiceField(
@@ -95,10 +118,11 @@ class FirstFactorForm(forms.ModelForm):
         cleaned_data = super().clean()
 
         if (
-            cleaned_data['first_factor'] == 'password' and (
-                cleaned_data['password1'] == '' or
-                cleaned_data['password2'] == '' or
-                cleaned_data['password2'] != cleaned_data['password1']
+            cleaned_data['first_factor'] == 'password'
+            and (
+                cleaned_data['password1'] == ''
+                or cleaned_data['password2'] == ''
+                or cleaned_data['password2'] != cleaned_data['password1']
             )
         ):
             raise forms.ValidationError("Les mots de passe saisis sont différents.")
@@ -142,17 +166,13 @@ class SecondFactorForm(forms.ModelForm):
         cleaned_data = super().clean()
 
         second_factor = cleaned_data['second_factor']
-        if (
-            (
-                second_factor == 'sms' and
-                cleaned_data['phone_number_sms'] == ''
-            )
-            or
-            (
-                second_factor == 'call' and
-                cleaned_data['phone_number_call'] == ''
-            )
-        ):
+        if ((
+            second_factor == 'sms'
+            and cleaned_data['phone_number_sms'] == ''
+        ) or (
+            second_factor == 'call'
+            and cleaned_data['phone_number_call'] == ''
+        )):
             raise forms.ValidationError("Vous devez saisir un numéro de téléphone.")
 
         return cleaned_data
@@ -177,13 +197,13 @@ class SecondFactorForm(forms.ModelForm):
 
         elif second_factor == 'app':
             TOTPDevice.objects.create(
-                user=new_aidant,
+                user=new_user,
                 name='default',
             )
 
         elif second_factor == 'key':
             RemoteYubikeyDevice.objects.create(
-                user=new_aidant,
+                user=new_user,
                 name='default',
                 service=ValidationService.objects.get(name='default'),
             )

@@ -1,0 +1,15 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block stepname %}Connexion renforcée par application mobile{% endblock %}
+
+{% block stepintro %}
+    <p>
+        <strong>Il est très important que votre identité soit garantie</strong> pendant que vous utilisez Aidants Connect.<br>
+        Nous vous invitons donc à utiliser une application mobile pour renforcer votre connexion.<br>
+        Passez à l'étape suivante, on vous explique tout !
+    </p>
+{% endblock %}
+
+{% block stepformfields %}
+    <input type="hidden" name="second_factor" value="app">
+{% endblock %}

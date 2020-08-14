@@ -1,5 +1,7 @@
 {% extends 'flexauth/register/second_factor_validation.html' %}
 
+{% block stepname %}Configuration de l'application mobile{% endblock %}
+
 {% block stepintro %}
     <p>Pour valider votre inscription, merci de suivre la procédure suivante :</p>
     <ol>
@@ -12,6 +14,6 @@
                  src="{% url 'flexauth:generate_totp_qrcode' totp_device_id=new_user.totp_device.id %}">
         </div>
 
-        <li>Saisissez le code de sécurité généré ensuite par l'application :</li>
+        <li>Saisissez ensuite le code de sécurité généré par l'application :</li>
     </ol>
 {% endblock %}
