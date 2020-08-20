@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -297,6 +297,14 @@ class MandatQuerySet(models.QuerySet):
             Q(expiration_date__lt=timezone.now())
             | ~Q(autorisations__revocation_date__isnull=True)
         ).distinct()
+
+    def agg_timeseries(self):
+        return (
+            self.extra(select={"day": "to_char(creation_date, 'YYYY-MM-DD')"})
+            .values("day")
+            .annotate(count=Count("creation_date"))
+            .order_by("day")
+        )
 
 
 class Mandat(models.Model):

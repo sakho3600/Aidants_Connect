@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "aidants_connect_web",
     "admin_honeypot",
+    "controlcenter",
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
@@ -323,11 +324,12 @@ CSP_IMG_SRC = (
 )
 CSP_SCRIPT_SRC = (
     "'self'",
-    "'sha256-FUfFEwUd+ObSebyGDfkxyV7KwtyvBBwsE/VxIOfPD68='",  # tabbed_admin
-    "'sha256-dzE1fiHF13yOIlSQf8CYbmucPoYAOHwQ70Y3OO70o+E='",  # main.html
-    "'sha256-qtDLNBeXbQEZ6BoCPDfxDpo3OOJsnlVc/NGAMBmfHq0='",  # new_mandat.html
+    # "'sha256-FUfFEwUd+ObSebyGDfkxyV7KwtyvBBwsE/VxIOfPD68='",  # tabbed_admin
+    # "'sha256-dzE1fiHF13yOIlSQf8CYbmucPoYAOHwQ70Y3OO70o+E='",  # main.html
+    # "'sha256-qtDLNBeXbQEZ6BoCPDfxDpo3OOJsnlVc/NGAMBmfHq0='",  # new_mandat.html
+    "'unsafe-inline'",  # django-controlcenter
 )
-CSP_STYLE_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_OBJECT_SRC = ("'none'",)
 CSP_FRAME_SRC = (
     "https://www.youtube.com/embed/hATrqHG4zYQ",
@@ -338,6 +340,8 @@ CSP_FRAME_SRC = (
 # Admin Page settings
 ADMIN_URL = os.getenv("ADMIN_URL")
 ADMINS = [(os.getenv("ADMIN_NAME"), os.getenv("ADMIN_EMAIL"))]
+
+CONTROLCENTER_DASHBOARDS = (("test", "aidants_connect_web.dashboards.MyDashboard"),)
 
 # Sessions
 SESSION_COOKIE_AGE = int(
