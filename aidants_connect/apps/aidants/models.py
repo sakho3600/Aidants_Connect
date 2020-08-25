@@ -6,9 +6,9 @@ from ..flexauth.mixins import WithFlexAuth
 
 
 class Organisation(models.Model):
-    name = models.TextField("Nom", default="No name provided")
-    siret = models.PositiveIntegerField("N° SIRET", default=1)
-    address = models.TextField("Adresse", default="No address provided")
+    name = models.CharField("Nom", max_length=255, unique=True)
+    address = models.TextField("Adresse", blank=True)
+    siret = models.CharField("N° SIRET", max_length=32, blank=True)
 
     class Meta:
         db_table = "aidants_connect_web_organisation"

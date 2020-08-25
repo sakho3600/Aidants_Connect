@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "django_extensions",
     "phonenumber_field",
+    "import_export",
 
     # project apps
     "aidants_connect.apps.aidants.apps.AidantsConfig",

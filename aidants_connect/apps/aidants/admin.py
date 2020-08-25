@@ -2,18 +2,50 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
+from import_export import resources
+from import_export.admin import ImportExportMixin
+from import_export.fields import Field as ImportExportField
+from import_export.widgets import ForeignKeyWidget as ImportExportForeignKeyWidget
+
 from aidants_connect.apps.web.admin import VisibleToStaff
 
 from .forms import AidantChangeForm, AidantCreationForm
 from .models import Aidant, Organisation
 
 
-class OrganisationAdmin(VisibleToStaff, ModelAdmin):
+
+class OrganisationResource(resources.ModelResource):
+    class Meta:
+        model = Organisation
+        fields = ("id", "name", "address")
+
+
+class OrganisationAdmin(VisibleToStaff, ImportExportMixin, ModelAdmin):
+    resource_class = OrganisationResource
+
     list_display = ("name", "address", "admin_num_aidants", "admin_num_mandats")
     search_fields = ("name",)
 
 
-class AidantAdmin(VisibleToStaff, DjangoUserAdmin):
+class AidantResource(resources.ModelResource):
+
+    # See: https://django-import-export.readthedocs.io/en/latest/api_widgets.html#import_export.widgets.ForeignKeyWidget  # noqa
+
+    organisation = ImportExportField(
+        column_name='organisation',
+        attribute='organisation',
+        widget=ImportExportForeignKeyWidget(
+            Organisation, 'name'
+        )
+    )
+
+    class Meta:
+        model = Aidant
+        fields = ("id", "username", "first_name", "last_name", "email", "organisation")
+
+
+class AidantAdmin(VisibleToStaff, ImportExportMixin, DjangoUserAdmin):
+    resource_class = AidantResource
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
