@@ -1,9 +1,6 @@
 from django import forms
-
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-
-from django_otp import match_token
 
 from aidants_connect import constants
 
@@ -52,30 +49,7 @@ class MandatForm(forms.Form):
             )
 
 
-class OTPForm(forms.Form):
-    otp_token = forms.CharField(
-        max_length=6,
-        min_length=6,
-        validators=[RegexValidator(r"^\d{6}$")],
-        label="Entrez le code à 6 chiffres généré par votre téléphone",
-        widget=forms.TextInput(attrs={"autocomplete": "off"}),
-    )
-
-    def __init__(self, aidant, *args, **kwargs):
-        super(OTPForm, self).__init__(*args, **kwargs)
-        self.aidant = aidant
-
-    def clean_otp_token(self):
-        otp_token = self.cleaned_data["otp_token"]
-        aidant = self.aidant
-        good_token = match_token(aidant, otp_token)
-        if good_token:
-            return otp_token
-        else:
-            raise ValidationError("Ce code n'est pas valide.")
-
-
-class RecapMandatForm(OTPForm, forms.Form):
+class RecapMandatForm(forms.Form):
     personal_data = forms.BooleanField(
         label="J’autorise mon aidant à utiliser mes données à caractère personnel."
     )

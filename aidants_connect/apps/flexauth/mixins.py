@@ -13,6 +13,10 @@ from otp_yubikey.models import RemoteYubikeyDevice
 from two_factor.models import PhoneDevice
 
 from . import constants
+from .login.forms import (
+    get_first_factor_login_form_class,
+    get_second_factor_login_form_class,
+)
 
 
 class WithFlexAuth(models.Model):
@@ -37,13 +41,12 @@ class WithFlexAuth(models.Model):
         abstract = True
 
     @property
-    def tfa_device(self):
-        if self.second_factor in ('sms', 'call'):
-            return self.phone_device
-        elif self.second_factor == 'app':
-            return self.totp_device
-        elif self.second_factor == 'key':
-            return self.yubikey_device
+    def first_factor_login_form_class(self):
+        return get_first_factor_login_form_class(self.first_factor)
+
+    @property
+    def second_factor_login_form_class(self):
+        return get_second_factor_login_form_class(self.second_factor)
 
     @property
     def phone_device(self):
@@ -56,6 +59,15 @@ class WithFlexAuth(models.Model):
     @property
     def yubikey_device(self):
         return RemoteYubikeyDevice.objects.filter(user=self).first()
+
+    @property
+    def tfa_device(self):
+        if self.second_factor in ('sms', 'call'):
+            return self.phone_device
+        elif self.second_factor == 'app':
+            return self.totp_device
+        elif self.second_factor == 'key':
+            return self.yubikey_device
 
     def send_sesame(self, base_url=None, extra_params=None, extra_context=None):
 
@@ -81,9 +93,9 @@ class WithFlexAuth(models.Model):
         html_body_template = '%s/body.html' % TEMPLATES_PATH
 
         context = {
-            "user": self,
-            "sesame_url": sesame_url,
-            "sesame_ttl_minutes": sesame_ttl_minutes,
+            'user': self,
+            'sesame_url': sesame_url,
+            'sesame_ttl_minutes': sesame_ttl_minutes,
         }
         if extra_context:
             context.update(extra_context)

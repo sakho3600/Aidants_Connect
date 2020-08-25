@@ -86,65 +86,83 @@ class MfsFirstFactorForm(BaseFirstFactorForm):
 
 
 class BaseSecondFactorForm(forms.Form):
-    second_factor = forms.CharField(label="Second facteur d'authentification")
+    second_factor = forms.CharField(
+        label="Second facteur d'authentification",
+        widget=forms.TextInput(attrs={'autocomplete': 'off'}),
+    )
 
     def __init__(self, *args, **kwargs):
+
+        self.user = kwargs.pop('user', None)
+
         super().__init__(*args, **kwargs)
         sf_field = self.fields['second_factor']
         sf_field.widget.attrs.update({
             'autofocus': 'true'
         })
 
-    def _get_otp_user(self, request):
-        return request.user
+    def get_otp_device(self):
+        try:
+            return self.user.tfa_device
+        except AttributeError:
+            raise RuntimeError("No user found for 2FA validation.")
 
-    def _get_otp_device(self, request):
-        return NotImplementedError
-
-    def _get_otp_token(self):
+    def get_otp_token(self):
         return self.cleaned_data['second_factor']
 
     def generate_challenge(self):
-        pass  # noop if no challenge is required with this method
+        pass  # noop if no challenge is required with this device type
 
-    def validate(self, request):
-        otp_device = self._get_otp_device(request)
+    def validate(self):
+        otp_device = self.get_otp_device()
         if not otp_device:
-            raise ValueError("No validation device found.")
-        otp_token = self._get_otp_token(request)
+            raise ValueError("No 2FA validation device found.")
+        otp_token = self.get_otp_token()
         if not otp_token:
-            raise ValueError("No validation token found.")
+            raise ValueError("No 2FA validation token found.")
 
         if otp_device.verify_token(otp_token):
             return True
+        else:
+            raise forms.ValidationError("Le code de sécurité est invalide.")
 
     def authenticate(self, request):
-        if self.validate(request):
-            otp_login(self.otp_device)
+        if self.validate():
+            otp_login(request, self.get_otp_device())
             return True
 
 
 class AppSecondFactorForm(BaseSecondFactorForm):
-    def _get_otp_device(self, request):
-        return self._get_otp_user(request).totp_device
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        sf_field = self.fields['second_factor']
+        sf_field.label = "Code de sécurité"
 
 
 class KeySecondFactorForm(BaseSecondFactorForm):
-    def _get_otp_device(self, request):
-        return self._get_otp_user(request).yubikey_device
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        sf_field = self.fields['second_factor']
+        sf_field.label = "Empreinte de la clé de sécurité"
 
 
 class PhoneDeviceSecondFactorForm(BaseSecondFactorForm):
-    def _get_otp_device(self, request):
-        return self._get_otp_user(request).phone_device
+    def generate_challenge(self):
 
-    def generate_challenge(self, request):
-        self._get_otp_device(request).generate_challenge()
+        # Those OTP devices need a "challenge" to be generated,
+        # ie. a message to be sent (via sms or phone call).
+        self.get_otp_device().generate_challenge()
 
 
 class CallSecondFactorForm(PhoneDeviceSecondFactorForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        sf_field = self.fields['second_factor']
+        sf_field.label = "Code reçu par téléphone"
 
 
 class SmsSecondFactorForm(PhoneDeviceSecondFactorForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        sf_field = self.fields['second_factor']
+        sf_field.label = "Code reçu par SMS"

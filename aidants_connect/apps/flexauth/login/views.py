@@ -59,7 +59,6 @@ def login_first_factor(request):
         form = form_class(request.POST)
         if user and form.is_valid():
             if form.authenticate(request, username):
-                form.generate_challenge()
                 return redirect(request.POST.get('next'))
     else:
         form = form_class()
@@ -85,12 +84,13 @@ def login_second_factor(request):
     form_class = login_forms.get_second_factor_login_form_class(second_factor)
 
     if request.method == 'POST':
-        form = form_class(request.POST)
+        form = form_class(request.POST, user=user)
         if form.is_valid():
             if form.authenticate(request):
                 return redirect(request.POST.get('next'))
     else:
-        form = form_class()
+        form = form_class(user=user)
+        form.generate_challenge()
 
     template_name = "%s/%s_%s.html" % (
         TEMPLATES_PATH,

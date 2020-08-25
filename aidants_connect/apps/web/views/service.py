@@ -14,7 +14,6 @@ from aidants_connect import constants
 
 from aidants_connect.apps.aidants.models import Aidant, Organisation
 from aidants_connect.apps.logs.models import Journal
-from aidants_connect.apps.mandats.forms import OTPForm
 from aidants_connect.apps.mandats.models import Mandat
 from aidants_connect.apps.usagers.models import Usager
 
@@ -154,14 +153,17 @@ def activity_check(request):
         return HttpResponseNotFound()
 
     aidant = request.user
+    form_class = aidant.second_factor_login_form_class
+
     if request.method == "POST":
-        form = OTPForm(aidant=aidant, data=request.POST)
+        form = form_class(user=aidant, data=request.POST)
 
         if form.is_valid():
             Journal.log_activity_check(aidant)
             return redirect(next_page)
     else:
-        form = OTPForm(request.user)
+        form = form_class(request.user)
+        form.generate_challenge()
 
     return render(
         request, "login/activity_check.html", {"form": form, "aidant": aidant}

@@ -84,17 +84,22 @@ def new_mandat(request):
 @activity_required
 def new_mandat_recap(request):
     connection = Connection.objects.get(pk=request.session["connection"])
-    aidant = request.user
     usager = connection.usager
+    aidant = request.user
+    form_class = aidant.second_factor_login_form_class
+
     # Django magic :
     # https://docs.djangoproject.com/en/3.0/ref/models/instances/#django.db.models.Model.get_FOO_display
     duree = connection.get_duree_keyword_display()
+
     demarches_description = [
         humanize_demarche_names(demarche) for demarche in connection.demarches
     ]
 
     if request.method == "GET":
         form = RecapMandatForm(aidant)
+        form_2fa = form_class(user=aidant)
+        form_2fa.generate_challenge()
         return render(
             request,
             "web/new_mandat/new_mandat_recap.html",
@@ -104,13 +109,15 @@ def new_mandat_recap(request):
                 "demarches": demarches_description,
                 "duree": duree,
                 "form": form,
+                "form_2fa": form_2fa,
             },
         )
 
     else:
         form = RecapMandatForm(aidant=aidant, data=request.POST)
+        form_2fa = form_class(user=aidant, data=request.POST)
 
-        if form.is_valid():
+        if form.is_valid() and form_2fa.is_valid():
             now = timezone.now()
             expiration_date = {
                 "SHORT": now + timedelta(days=1),
