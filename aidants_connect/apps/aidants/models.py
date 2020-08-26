@@ -2,19 +2,29 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.functional import cached_property
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 from ..flexauth.mixins import WithFlexAuth
 
 
 class Organisation(models.Model):
     name = models.CharField("Nom", max_length=255, unique=True)
-    address = models.TextField("Adresse", blank=True)
+    address = models.CharField("Adresse", max_length=255, blank=True)
+    zip_code = models.CharField("Code postal", max_length=32, blank=True)
+    city = models.CharField("Ville", max_length=255, blank=True)
+
+    contact_firstname = models.CharField("Prénom du contact", max_length=255, blank=True)
+    contact_lastname = models.CharField("Nom du contact", max_length=255, blank=True)
+    contact_email = models.EmailField("Adresse email du contact", blank=True)
+    contact_phone = PhoneNumberField("Téléphone du contact", blank=True)
+
     siret = models.CharField("N° SIRET", max_length=32, blank=True)
 
     class Meta:
         db_table = "aidants_connect_web_organisation"
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name} ({self.city})" if self.city else f"{self.name}"
 
     @cached_property
     def num_aidants(self):

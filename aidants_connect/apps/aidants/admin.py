@@ -13,18 +13,45 @@ from .forms import AidantChangeForm, AidantCreationForm
 from .models import Aidant, Organisation
 
 
-
 class OrganisationResource(resources.ModelResource):
     class Meta:
         model = Organisation
-        fields = ("id", "name", "address")
+        fields = (
+            "id",
+            "name", "address", "zip_code", "city",
+            "siret",
+            "contact_firstname", "contact_lastname",
+            "contact_email", "contact_phone",
+        )
 
 
 class OrganisationAdmin(VisibleToStaff, ImportExportMixin, ModelAdmin):
     resource_class = OrganisationResource
 
-    list_display = ("name", "address", "admin_num_aidants", "admin_num_mandats")
-    search_fields = ("name",)
+    list_display = (
+        "name", "city", "contact_email", "contact_phone",
+        "admin_num_aidants", "admin_num_mandats"
+    )
+    search_fields = (
+        "name", "address", "zip_code", "city",
+        "contact_firstname", "contact_lastname"
+    )
+
+    fieldsets = (
+        (
+            "",
+            {"fields": (
+                "name", "address", "zip_code", "city", "siret"
+            )},
+        ),
+        (
+            "Contact",
+            {"fields": (
+                "contact_firstname", "contact_lastname",
+                "contact_email", "contact_phone",
+            )},
+        ),
+    )
 
 
 class AidantResource(resources.ModelResource):
@@ -41,7 +68,17 @@ class AidantResource(resources.ModelResource):
 
     class Meta:
         model = Aidant
-        fields = ("id", "username", "first_name", "last_name", "email", "organisation")
+        fields = (
+            "id",
+            "first_name", "last_name", "email",
+            "username", "organisation", "profession"
+        )
+
+    def after_save_instance(self, instance, using_transactions, dry_run):
+        if not dry_run:
+            instance.is_active = False
+            instance.set_unusable_password()
+            instance.save()
 
 
 class AidantAdmin(VisibleToStaff, ImportExportMixin, DjangoUserAdmin):
