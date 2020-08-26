@@ -6,8 +6,10 @@ from django.contrib import messages as django_messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.utils import timezone, formats
+from django.shortcuts import redirect, render
+from django.utils import formats, timezone
+
+from django_otp.decorators import otp_required
 
 from aidants_connect.apps.logs.models import Journal
 from aidants_connect.apps.mandats.forms import MandatForm, RecapMandatForm
@@ -46,8 +48,8 @@ def generate_attestation_hash(aidant, usager, demarches, expiration_date):
     return generate_sha256_hash(attestation_string_with_salt.encode("utf-8"))
 
 
+@otp_required
 @login_required
-#@activity_required
 def new_mandat(request):
     aidant = request.user
     form = MandatForm()
@@ -80,8 +82,8 @@ def new_mandat(request):
             )
 
 
+@otp_required
 @login_required
-#@activity_required
 def new_mandat_recap(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     usager = connection.usager
@@ -209,8 +211,8 @@ def new_mandat_recap(request):
             )
 
 
+@otp_required
 @login_required
-#@activity_required
 def new_mandat_success(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user
@@ -223,8 +225,8 @@ def new_mandat_success(request):
     )
 
 
+@otp_required
 @login_required
-#@activity_required
 def attestation_projet(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user
@@ -249,8 +251,8 @@ def attestation_projet(request):
     )
 
 
+@otp_required
 @login_required
-#@activity_required
 def attestation_final(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user
@@ -276,8 +278,8 @@ def attestation_final(request):
     )
 
 
+@otp_required
 @login_required
-#@activity_required
 def attestation_qrcode(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user

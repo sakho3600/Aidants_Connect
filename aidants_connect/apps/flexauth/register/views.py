@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -14,8 +15,16 @@ User = get_user_model()
 
 TEMPLATES_PATH = 'flexauth/register'
 
+REGISTRATION_MODE = settings.FLEXAUTH_REGISTRATION_MODE
+
+
+# TODO: Lots of refactoring in here. Decorator(s) probably.
+
 
 def register_identity(request):
+    if REGISTRATION_MODE not in ('open', 'restricted'):
+        return redirect('home_page')
+
     if request.method == 'POST':
         form = forms.IdentityForm(request.POST)
         if form.is_valid():
@@ -34,6 +43,9 @@ def register_identity(request):
 
 
 def register_organisation(request):
+    if REGISTRATION_MODE not in ('open', 'restricted'):
+        return redirect('home_page')
+
     try:
         new_user = User.objects.get(pk=request.session.get('new_user_id'))
     except User.DoesNotExist:
@@ -58,6 +70,9 @@ def register_organisation(request):
 
 
 def register_first_factor(request):
+    if REGISTRATION_MODE not in ('open', 'restricted'):
+        return redirect('home_page')
+
     try:
         new_user = User.objects.get(pk=request.session.get('new_user_id'))
     except User.DoesNotExist:
@@ -88,6 +103,9 @@ def register_first_factor(request):
 
 
 def register_second_factor(request):
+    if REGISTRATION_MODE not in ('open', 'restricted'):
+        return redirect('home_page')
+
     try:
         new_user = User.objects.get(pk=request.session.get('new_user_id'))
     except User.DoesNotExist:
@@ -118,6 +136,9 @@ def register_second_factor(request):
 
 
 def validate_second_factor(request):
+    if REGISTRATION_MODE not in ('open', 'restricted'):
+        return redirect('home_page')
+
     try:
         new_user = User.objects.get(pk=request.session.get('new_user_id'))
     except User.DoesNotExist:
@@ -155,6 +176,9 @@ def generate_totp_qrcode(request, totp_device_id):
 
 
 def success(request):
+    if REGISTRATION_MODE not in ('open', 'restricted'):
+        return redirect('home_page')
+
     try:
         User.objects.get(pk=request.session.get('new_user_id'))
     except User.DoesNotExist:

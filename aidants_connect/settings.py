@@ -120,6 +120,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+
+                # Include to allow toggling visibility of register links
+                "aidants_connect.apps.flexauth.context_processors.registration_mode",
             ]
         },
     }
@@ -301,19 +304,21 @@ ACTIVITY_CHECK_URL = "activity_check"
 ACTIVITY_CHECK_THRESHOLD = int(os.getenv("ACTIVITY_CHECK_THRESHOLD"))
 ACTIVITY_CHECK_DURATION = timedelta(minutes=ACTIVITY_CHECK_THRESHOLD)
 
-FLEXAUTH_AVAILABLE_1AF = os.getenv('FLEXAUTH_AVAILABLE_1AF', 'password,email').split(ENV_LIST_SEPARATOR)
-FLEXAUTH_AVAILABLE_2AF = os.getenv('FLEXAUTH_AVAILABLE_2AF', 'app,sms,call,key').split(ENV_LIST_SEPARATOR)
-FLEXAUTH_DEFAULT_1AF = os.getenv('FLEXAUTH_DEFAULT_1AF', 'password')
-FLEXAUTH_DEFAULT_2AF = os.getenv('FLEXAUTH_DEFAULT_2AF', 'app')
-FLEXAUTH_BASE_URL = os.getenv('FLEXAUTH_BASE_URL', 'https://%s' % HOST)
+FLEXAUTH_REGISTRATION_MODE = os.getenv("FLEXAUTH_REGISTRATION_MODE", "closed")  # open | restricted | closed
+
+FLEXAUTH_AVAILABLE_1AF = os.getenv("FLEXAUTH_AVAILABLE_1AF", "password,email").split(ENV_LIST_SEPARATOR)
+FLEXAUTH_AVAILABLE_2AF = os.getenv("FLEXAUTH_AVAILABLE_2AF", "app,sms,call,key").split(ENV_LIST_SEPARATOR)
+FLEXAUTH_DEFAULT_1AF = os.getenv("FLEXAUTH_DEFAULT_1AF", "password")
+FLEXAUTH_DEFAULT_2AF = os.getenv("FLEXAUTH_DEFAULT_2AF", "app")
+FLEXAUTH_BASE_URL = os.getenv("FLEXAUTH_BASE_URL", "https://%s" % HOST)
 
 SESAME_ONE_TIME = True
 SESAME_MAX_AGE = int(os.getenv("SESAME_MAX_AGE", 60 * 15))  # default: 15 mn
 
 TWO_FACTOR_GATEWAY_FAKE = "two_factor.gateways.fake.Fake"
 TWO_FACTOR_GATEWAY_TWILIO = "two_factor.gateways.twilio.gateway.Twilio"
-TWO_FACTOR_SMS_GATEWAY = TWO_FACTOR_GATEWAY_TWILIO if 'sms' in FLEXAUTH_AVAILABLE_2AF else TWO_FACTOR_GATEWAY_FAKE
-TWO_FACTOR_CALL_GATEWAY = TWO_FACTOR_GATEWAY_TWILIO if 'call' in FLEXAUTH_AVAILABLE_2AF else TWO_FACTOR_GATEWAY_FAKE
+TWO_FACTOR_SMS_GATEWAY = TWO_FACTOR_GATEWAY_TWILIO if "sms" in FLEXAUTH_AVAILABLE_2AF else TWO_FACTOR_GATEWAY_FAKE
+TWO_FACTOR_CALL_GATEWAY = TWO_FACTOR_GATEWAY_TWILIO if "call" in FLEXAUTH_AVAILABLE_2AF else TWO_FACTOR_GATEWAY_FAKE
 TWO_FACTOR_PATCH_ADMIN = (
     True if os.getenv("TWO_FACTOR_PATCH_ADMIN") == "True" else False
 )
