@@ -35,7 +35,9 @@ def generate_attestation_hash(aidant, usager, demarches, expiration_date):
         "demarches_list": ",".join(demarches),
         "expiration_date": expiration_date.date().isoformat(),
         "organisation_id": aidant.organisation.id,
-        "template_hash": generate_file_sha256_hash(settings.MANDAT_TEMPLATE_PATH),
+        "template_hash": generate_file_sha256_hash(
+            settings.MANDAT_TEMPLATE_ABSOLUTE_PATH
+        ),
         "usager_sub": usager.sub,
     }
     sorted_attestation_data = dict(sorted(attestation_data.items()))
@@ -97,7 +99,7 @@ def new_mandat_recap(request):
     ]
 
     if request.method == "GET":
-        form = RecapMandatForm(aidant)
+        form = RecapMandatForm()
         form_2fa = form_class(user=aidant)
         form_2fa.generate_challenge()
         return render(
@@ -114,8 +116,8 @@ def new_mandat_recap(request):
         )
 
     else:
-        form = RecapMandatForm(aidant=aidant, data=request.POST)
-        form_2fa = form_class(user=aidant, data=request.POST)
+        form = RecapMandatForm(request.POST)
+        form_2fa = form_class(request.POST, user=aidant)
 
         if form.is_valid() and form_2fa.is_valid():
             now = timezone.now()
@@ -239,11 +241,12 @@ def attestation_projet(request):
         request,
         "web/attestation.html",
         {
-            "usager": usager,
             "aidant": aidant,
             "date": formats.date_format(date.today(), "l j F Y"),
             "demarches": [humanize_demarche_names(demarche) for demarche in demarches],
             "duree": duree,
+            "mandat_template_relative_path": settings.MANDAT_TEMPLATE_RELATIVE_PATH,
+            "usager": usager,
         },
     )
 
@@ -264,12 +267,13 @@ def attestation_final(request):
         request,
         "web/attestation.html",
         {
-            "usager": usager,
             "aidant": aidant,
             "date": formats.date_format(date.today(), "l j F Y"),
             "demarches": [humanize_demarche_names(demarche) for demarche in demarches],
             "duree": duree,
             "final": True,
+            "mandat_template_relative_path": settings.MANDAT_TEMPLATE_RELATIVE_PATH,
+            "usager": usager,
         },
     )
 

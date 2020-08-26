@@ -130,6 +130,12 @@ MIDDLEWARE = [
 ROOT_URLCONF = "aidants_connect.urls"
 
 TEMPLATES_DIR = os.path.join(PROJECT_DIR, "templates")
+
+MANDAT_TEMPLATE_RELATIVE_PATH = "mandats/20200511_mandat.html"
+MANDAT_TEMPLATE_ABSOLUTE_PATH = os.path.join(
+    TEMPLATES_DIR, MANDAT_TEMPLATE_RELATIVE_PATH
+)
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -234,9 +240,7 @@ ACTIVITY_CHECK_DURATION = timedelta(minutes=ACTIVITY_CHECK_THRESHOLD)
 
 AUTH_USER_MODEL = "aidants.Aidant"
 
-MANDAT_TEMPLATE_PATH = (
-    "templates/aidants_connect_web/mandat_templates/20200511_mandat.html"
-)
+
 ATTESTATION_SALT = os.getenv("ATTESTATION_SALT", "")
 
 # TOTP
