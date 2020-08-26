@@ -22,45 +22,40 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
 
 
-def humanize_demarche_names(name: str) -> str:
-    """
-    >>> humanize_demarche_names('argent')
-    "ARGENT: Crédit immobilier, Impôts, Consommation, Livret A, Assurance, "
-            "Surendettement…"
-    :param machine_names:
-    :return: list of human names and description
-    """
-    demarches = constants.DEMARCHES
-    return f"{demarches[name]['titre'].upper()}: {demarches[name]['description']}"
-
-
 def home_page(request):
     if request.GET.get("infolettre", ""):
         django_messages.success(
             request, "Votre inscription à l'infolettre a bien été prise en compte."
         )
-    return render(request, "public_website/home_page.html")
+    return render(request, "web/public/home_page.html")
 
 
-@login_required
-def logout_page(request):
-    logout(request)
-    return redirect(settings.LOGOUT_REDIRECT_URL)
+def cgu(request):
+    return render(request, "web/public/cgu.html")
 
 
-@login_required
-def dashboard(request):
-    aidant = request.user
-    messages = django_messages.get_messages(request)
-    return render(
-        request,
-        "web/dashboard.html",
-        {"aidant": aidant, "messages": messages},
-    )
+def mentions_legales(request):
+    return render(request, "web/public/mentions_legales.html")
+
+
+def faq_generale(request):
+    return render(request, "web/public/faq/generale.html")
+
+
+def faq_mandat(request):
+    return render(request, "web/public/faq/mandat.html")
+
+
+def faq_donnees_personnelles(request):
+    return render(request, "web/public/faq/donnees_personnelles.html")
 
 
 def guide_utilisation(request):
-    return render(request, "public_website/guide_utilisation.html")
+    return render(request, "web/public/guide_utilisation.html")
+
+
+def ressources(request):
+    return render(request, "web/public/ressource_page.html")
 
 
 def statistiques(request):
@@ -123,7 +118,7 @@ def statistiques(request):
 
     return render(
         request,
-        "public_website/statistiques.html",
+        "web/public/statistiques.html",
         {
             "organisations_count": organisations_count,
             "aidants_count": aidants_count,
@@ -140,7 +135,7 @@ def statistiques(request):
     )
 
 
-@login_required()
+@login_required
 def activity_check(request):
     next_page = request.GET.get("next", settings.LOGIN_REDIRECT_URL)
 
@@ -170,25 +165,7 @@ def activity_check(request):
     )
 
 
-def cgu(request):
-    return render(request, "public_website/cgu.html")
-
-
-def mentions_legales(request):
-    return render(request, "public_website/mentions_legales.html")
-
-
-def ressources(request):
-    return render(request, "public_website/ressource_page.html")
-
-
-def faq_generale(request):
-    return render(request, "public_website/faq/generale.html")
-
-
-def faq_mandat(request):
-    return render(request, "public_website/faq/mandat.html")
-
-
-def faq_donnees_personnelles(request):
-    return render(request, "public_website/faq/donnees_personnelles.html")
+@login_required
+def logout_page(request):
+    logout(request)
+    return redirect(settings.LOGOUT_REDIRECT_URL)

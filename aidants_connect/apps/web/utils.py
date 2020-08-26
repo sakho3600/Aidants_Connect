@@ -43,3 +43,15 @@ def generate_qrcode_png(string: str):
     img = qrcode.make(string)
     img.save(stream, "PNG")
     return stream.getvalue()
+
+
+def humanize_demarche_names(name: str) -> str:
+    """
+    >>> humanize_demarche_names('argent')
+    "ARGENT: Crédit immobilier, Impôts, Consommation, Livret A, Assurance, "
+            "Surendettement…"
+    :param machine_names:
+    :return: list of human names and description
+    """
+    demarches = constants.DEMARCHES
+    return f"{demarches[name]['titre'].upper()}: {demarches[name]['description']}"

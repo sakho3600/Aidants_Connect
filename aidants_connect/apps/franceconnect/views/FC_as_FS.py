@@ -14,8 +14,7 @@ from secrets import token_urlsafe
 from aidants_connect.apps.logs.models import Journal
 from aidants_connect.apps.mandats.models import Connection
 from aidants_connect.apps.usagers.models import Usager
-
-from ..utils import generate_sha256_hash
+from aidants_connect.apps.web.utils import generate_sha256_hash
 
 
 logging.basicConfig(level=logging.INFO)

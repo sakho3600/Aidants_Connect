@@ -26,8 +26,7 @@ from aidants_connect import constants
 from aidants_connect.apps.logs.models import Journal
 from aidants_connect.apps.mandats.models import Connection
 from aidants_connect.apps.usagers.models import Usager
-
-from ..decorators import activity_required
+from aidants_connect.apps.web.decorators import activity_required
 
 
 logging.basicConfig(level=logging.INFO)
@@ -114,7 +113,7 @@ def authorize(request):
 
         return render(
             request,
-            "web/id_provider/authorize.html",
+            "franceconnect/FC_as_FI/authorize.html",
             {
                 "connection_id": connection.id,
                 "usagers": aidant.get_usagers_with_active_autorisation(),
@@ -190,7 +189,7 @@ def fi_select_demarche(request):
 
         return render(
             request,
-            "web/id_provider/fi_select_demarche.html",
+            "franceconnect/FC_as_FI/fi_select_demarche.html",
             {
                 "connection_id": connection.id,
                 "aidant": request.user.get_full_name(),

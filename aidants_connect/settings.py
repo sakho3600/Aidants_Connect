@@ -20,34 +20,7 @@ from .utils import turn_psql_url_into_param
 
 load_dotenv(verbose=True)
 
-HOST = os.environ["HOST"]
-
-# FC as FI
-FC_AS_FI_CALLBACK_URL = os.environ["FC_AS_FI_CALLBACK_URL"]
-FC_AS_FI_ID = os.environ["FC_AS_FI_ID"]
-FC_AS_FI_SECRET = os.environ["FC_AS_FI_SECRET"]
-FC_AS_FI_HASH_SALT = os.environ["FC_AS_FI_HASH_SALT"]
-
-# FC as FS
-FC_AS_FS_BASE_URL = os.environ["FC_AS_FS_BASE_URL"]
-FC_AS_FS_ID = os.environ["FC_AS_FS_ID"]
-FC_AS_FS_SECRET = os.environ["FC_AS_FS_SECRET"]
-FC_AS_FS_CALLBACK_URL = os.environ["FC_AS_FS_CALLBACK_URL"]
-
-FC_CONNECTION_AGE = int(os.environ["FC_CONNECTION_AGE"])
-
-if os.environ.get("FC_AS_FS_TEST_PORT"):
-    FC_AS_FS_TEST_PORT = int(os.environ["FC_AS_FS_TEST_PORT"])
-else:
-    FC_AS_FS_TEST_PORT = 0
-
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-PROJECT_DIR = os.path.join(BASE_DIR, "aidants_connect")
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
+ENV_LIST_SEPARATOR = ","
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("APP_SECRET")
@@ -58,21 +31,26 @@ if os.getenv("DEBUG") == "True":
 else:
     DEBUG = False
 
-ENV_SEPARATOR = ","
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(ENV_SEPARATOR)
+HOST = os.getenv("HOST")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(ENV_LIST_SEPARATOR)
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PROJECT_DIR = os.path.join(BASE_DIR, "aidants_connect")
 
 
-# Application definition
+# --- Application definition
+
+WSGI_APPLICATION = "aidants_connect.wsgi.application"
 
 INSTALLED_APPS = [
 
-    # admin-related apps
+    # Admin-related apps
     "django.contrib.admin",
     "nested_admin",
     "tabbed_admin",
     "admin_honeypot",
 
-    # auth-related apps
+    # Auth-related apps
     "django.contrib.auth",
     "django_otp",
     "django_otp.plugins.otp_static",
@@ -80,21 +58,22 @@ INSTALLED_APPS = [
     "otp_yubikey",
     "two_factor",
 
-    # other standard Django apps
+    # Other standard Django apps
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # third-party apps
+    # Third-party apps
     "django_celery_beat",
     "django_extensions",
     "phonenumber_field",
     "import_export",
 
-    # project apps
+    # Project apps
     "aidants_connect.apps.aidants.apps.AidantsConfig",
-    "aidants_connect.apps.flexauth.apps.FlexAuthConfig",
+    "aidants_connect.apps.flexauth",
+    "aidants_connect.apps.franceconnect",
     "aidants_connect.apps.logs.apps.LogsConfig",
     "aidants_connect.apps.mandats.apps.MandatsConfig",
     "aidants_connect.apps.usagers.apps.UsagersConfig",
@@ -130,12 +109,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = "aidants_connect.urls"
 
 TEMPLATES_DIR = os.path.join(PROJECT_DIR, "templates")
-
-MANDAT_TEMPLATE_RELATIVE_PATH = "mandats/20200511_mandat.html"
-MANDAT_TEMPLATE_ABSOLUTE_PATH = os.path.join(
-    TEMPLATES_DIR, MANDAT_TEMPLATE_RELATIVE_PATH
-)
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -152,10 +125,8 @@ TEMPLATES = [
     }
 ]
 
-WSGI_APPLICATION = "aidants_connect.wsgi.application"
 
-
-# Database
+# --- Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 postgres_url = os.getenv("POSTGRESQL_URL")
@@ -192,34 +163,7 @@ if ssl_option:
     DATABASES["default"]["OPTIONS"] = {"sslmode": ssl_option}
 
 
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
-LANGUAGE_CODE = "fr"
-
-TIME_ZONE = "Europe/Paris"
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
+# --- Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_ROOT = "staticfiles"
@@ -229,29 +173,51 @@ STATICFILES_DIRS = [
     os.path.join(PROJECT_DIR, "static"),
 ]
 
-LOGIN_URL = "flexauth:login"
-LOGIN_REDIRECT_URL = "usagers"
-LOGOUT_REDIRECT_URL = "home_page"
-OTP_LOGIN_URL = LOGIN_URL
 
-ACTIVITY_CHECK_URL = "activity_check"
-ACTIVITY_CHECK_THRESHOLD = int(os.getenv("ACTIVITY_CHECK_THRESHOLD"))
-ACTIVITY_CHECK_DURATION = timedelta(minutes=ACTIVITY_CHECK_THRESHOLD)
+# --- Internationalization
+# https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-AUTH_USER_MODEL = "aidants.Aidant"
+LANGUAGE_CODE = "fr"
+TIME_ZONE = "Europe/Paris"
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
 
 
-ATTESTATION_SALT = os.getenv("ATTESTATION_SALT", "")
+# --- Scheduled tasks
 
-# TOTP
-OTP_TOTP_ISSUER = os.getenv("OTP_TOTP_ISSUER", "Aidants Connect")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+JSON_CONTENT_TYPE = "application/json"
+JSON_SERIALIZER = "json"
 
-# Emails
+# Celery settings
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_RESULT_SERIALIZER = JSON_SERIALIZER
+CELERY_TASK_SERIALIZER = JSON_SERIALIZER
+CELERY_ACCEPT_CONTENT = [JSON_CONTENT_TYPE]
+
+
+# --- Admin
+
+ADMIN_URL = os.getenv("ADMIN_URL")
+ADMINS = [(os.getenv("ADMIN_NAME"), os.getenv("ADMIN_EMAIL"))]
+TABBED_ADMIN_USE_JQUERY_UI = True
+
+
+# --- Email
+
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", os.getenv("ADMIN_EMAIL"))
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", SERVER_EMAIL)
+ADMIN_HONEYPOT_EMAIL_ADMINS = os.getenv("ADMIN_HONEYPOT_EMAIL_ADMINS", SERVER_EMAIL)
+
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
 )
+
 ## if file based email backend is used (debug)
 EMAIL_FILE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/tmp_email_as_file"
+
 ## if smtp backend is used
 EMAIL_HOST = os.getenv("EMAIL_HOST", None)
 EMAIL_PORT = os.getenv("EMAIL_PORT", None)
@@ -260,10 +226,8 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", None)
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", None)
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", None)
 
-## Emails from the server
-SERVER_EMAIL = os.getenv("SERVER_EMAIL", os.getenv("ADMIN_EMAIL"))
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", SERVER_EMAIL)
-ADMIN_HONEYPOT_EMAIL_ADMINS = os.getenv("ADMIN_HONEYPOT_EMAIL_ADMINS", SERVER_EMAIL)
+
+# --- Security
 
 # Security headers
 SECURE_BROWSER_XSS_FILTER = True
@@ -291,76 +255,60 @@ CSP_FRAME_SRC = (
     "https://www.youtube.com/embed/ihsm-36I-fE",
 )
 
-# Admin Page settings
-ADMIN_URL = os.getenv("ADMIN_URL")
-ADMINS = [(os.getenv("ADMIN_NAME"), os.getenv("ADMIN_EMAIL"))]
-
 # Sessions
 SESSION_COOKIE_AGE = int(
     os.getenv("SESSION_COOKIE_AGE", 86400)
 )  # default: 24 hours, in seconds
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-# Cookie security
+# Cookies
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = False if os.getenv("SESSION_COOKIE_SECURE") == "False" else True
 CSRF_COOKIE_SECURE = False if os.getenv("CSRF_COOKIE_SECURE") == "False" else True
 
-# SSL security
+# SSL
 SECURE_SSL_REDIRECT = False if os.getenv("SECURE_SSL_REDIRECT") == "False" else True
 SECURE_HSTS_SECONDS = os.getenv("SECURE_HSTS_SECONDS")
 
-# django_OTP_throttling
-OTP_TOTP_THROTTLE_FACTOR = int(os.getenv("OTP_TOTP_THROTTLE_FACTOR", 1))
 
-# Functional tests behaviour
-HEADLESS_FUNCTIONAL_TESTS = (
-    False if os.getenv("HEADLESS_FUNCTIONAL_TESTS") == "False" else True
-)
-BYPASS_FIRST_LIVESERVER_CONNECTION = (
-    True if os.getenv("BYPASS_FIRST_LIVESERVER_CONNECTION") == "True" else False
-)
+# --- Authentication
 
-# Celery settings
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
-JSON_CONTENT_TYPE = "application/json"
-JSON_SERIALIZER = "json"
+AUTH_USER_MODEL = "aidants.Aidant"
 
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
-CELERY_RESULT_SERIALIZER = JSON_SERIALIZER
-CELERY_TASK_SERIALIZER = JSON_SERIALIZER
-CELERY_ACCEPT_CONTENT = [JSON_CONTENT_TYPE]
-
-# COVID-19 changes
-ETAT_URGENCE_2020_LAST_DAY = datetime.strptime(
-    os.getenv("ETAT_URGENCE_2020_LAST_DAY"), "%d/%m/%Y %H:%M:%S %z"
-)
-
-# Staff Organisation name
-STAFF_ORGANISATION_NAME = "BetaGouv"
-
-# Tabbed Admin
-TABBED_ADMIN_USE_JQUERY_UI = True
-
-# Shell Plus
-SHELL_PLUS_IMPORTS = [
-    "from datetime import datetime, timedelta",
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "sesame.backends.ModelBackend",
 ]
 
-# FlexAuth
-FLEXAUTH_AVAILABLE_1AF = os.getenv('FLEXAUTH_AVAILABLE_1AF', 'password,email').split(ENV_SEPARATOR)
-FLEXAUTH_AVAILABLE_2AF = os.getenv('FLEXAUTH_AVAILABLE_2AF', 'app,sms,call,key').split(ENV_SEPARATOR)
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+LOGIN_URL = "flexauth:login"
+LOGIN_REDIRECT_URL = "usagers"
+LOGOUT_REDIRECT_URL = "home_page"
+
+OTP_LOGIN_URL = LOGIN_URL
+OTP_TOTP_THROTTLE_FACTOR = int(os.getenv("OTP_TOTP_THROTTLE_FACTOR", 1))
+OTP_TOTP_ISSUER = os.getenv("OTP_TOTP_ISSUER", "Aidants Connect")
+
+ACTIVITY_CHECK_URL = "activity_check"
+ACTIVITY_CHECK_THRESHOLD = int(os.getenv("ACTIVITY_CHECK_THRESHOLD"))
+ACTIVITY_CHECK_DURATION = timedelta(minutes=ACTIVITY_CHECK_THRESHOLD)
+
+FLEXAUTH_AVAILABLE_1AF = os.getenv('FLEXAUTH_AVAILABLE_1AF', 'password,email').split(ENV_LIST_SEPARATOR)
+FLEXAUTH_AVAILABLE_2AF = os.getenv('FLEXAUTH_AVAILABLE_2AF', 'app,sms,call,key').split(ENV_LIST_SEPARATOR)
 FLEXAUTH_DEFAULT_1AF = os.getenv('FLEXAUTH_DEFAULT_1AF', 'password')
 FLEXAUTH_DEFAULT_2AF = os.getenv('FLEXAUTH_DEFAULT_2AF', 'app')
 FLEXAUTH_BASE_URL = os.getenv('FLEXAUTH_BASE_URL', 'https://%s' % HOST)
 
 SESAME_ONE_TIME = True
 SESAME_MAX_AGE = int(os.getenv("SESAME_MAX_AGE", 60 * 15))  # default: 15 mn
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "sesame.backends.ModelBackend",
-]
 
 TWO_FACTOR_GATEWAY_FAKE = "two_factor.gateways.fake.Fake"
 TWO_FACTOR_GATEWAY_TWILIO = "two_factor.gateways.twilio.gateway.Twilio"
@@ -375,3 +323,56 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
 TWILIO_CALLER_ID = os.getenv("TWILIO_CALLER_ID", "")
 
 PHONENUMBER_DEFAULT_REGION = os.getenv("PHONENUMBER_DEFAULT_REGION", "FR")
+
+
+# --- FranceConnect
+
+# FC as FI
+FC_AS_FI_CALLBACK_URL = os.environ["FC_AS_FI_CALLBACK_URL"]
+FC_AS_FI_ID = os.environ["FC_AS_FI_ID"]
+FC_AS_FI_SECRET = os.environ["FC_AS_FI_SECRET"]
+FC_AS_FI_HASH_SALT = os.environ["FC_AS_FI_HASH_SALT"]
+
+# FC as FS
+FC_AS_FS_BASE_URL = os.environ["FC_AS_FS_BASE_URL"]
+FC_AS_FS_ID = os.environ["FC_AS_FS_ID"]
+FC_AS_FS_SECRET = os.environ["FC_AS_FS_SECRET"]
+FC_AS_FS_CALLBACK_URL = os.environ["FC_AS_FS_CALLBACK_URL"]
+
+FC_CONNECTION_AGE = int(os.environ["FC_CONNECTION_AGE"])
+
+if os.environ.get("FC_AS_FS_TEST_PORT"):
+    FC_AS_FS_TEST_PORT = int(os.environ["FC_AS_FS_TEST_PORT"])
+else:
+    FC_AS_FS_TEST_PORT = 0
+
+
+# --- Development
+
+SHELL_PLUS_IMPORTS = [
+    "from datetime import datetime, timedelta",
+]
+
+# Functional tests behaviour
+HEADLESS_FUNCTIONAL_TESTS = (
+    False if os.getenv("HEADLESS_FUNCTIONAL_TESTS") == "False" else True
+)
+BYPASS_FIRST_LIVESERVER_CONNECTION = (
+    True if os.getenv("BYPASS_FIRST_LIVESERVER_CONNECTION") == "True" else False
+)
+
+
+# --- Business / miscellaneous
+
+STAFF_ORGANISATION_NAME = "BetaGouv"
+
+ATTESTATION_SALT = os.getenv("ATTESTATION_SALT", "")
+
+MANDAT_TEMPLATE_RELATIVE_PATH = "mandats/20200511_mandat.html"
+MANDAT_TEMPLATE_ABSOLUTE_PATH = os.path.join(
+    TEMPLATES_DIR, MANDAT_TEMPLATE_RELATIVE_PATH
+)
+
+ETAT_URGENCE_2020_LAST_DAY = datetime.strptime(
+    os.getenv("ETAT_URGENCE_2020_LAST_DAY"), "%d/%m/%Y %H:%M:%S %z"
+)
