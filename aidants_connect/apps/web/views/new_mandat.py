@@ -47,7 +47,7 @@ def generate_attestation_hash(aidant, usager, demarches, expiration_date):
 
 
 @login_required
-@activity_required
+#@activity_required
 def new_mandat(request):
     aidant = request.user
     form = MandatForm()
@@ -81,7 +81,7 @@ def new_mandat(request):
 
 
 @login_required
-@activity_required
+#@activity_required
 def new_mandat_recap(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     usager = connection.usager
@@ -210,7 +210,7 @@ def new_mandat_recap(request):
 
 
 @login_required
-@activity_required
+#@activity_required
 def new_mandat_success(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user
@@ -224,7 +224,7 @@ def new_mandat_success(request):
 
 
 @login_required
-@activity_required
+#@activity_required
 def attestation_projet(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user
@@ -249,7 +249,7 @@ def attestation_projet(request):
 
 
 @login_required
-@activity_required
+#@activity_required
 def attestation_final(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user
@@ -275,7 +275,7 @@ def attestation_final(request):
 
 
 @login_required
-@activity_required
+#@activity_required
 def attestation_qrcode(request):
     connection = Connection.objects.get(pk=request.session["connection"])
     aidant = request.user
