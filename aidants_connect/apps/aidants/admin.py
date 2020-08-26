@@ -104,8 +104,17 @@ class AidantAdmin(VisibleToStaff, ImportExportMixin, DjangoUserAdmin):
     # The fields to be used in displaying the `Aidant` model.
     # These override the definitions on the base `UserAdmin`
     # that references specific fields on `auth.User`.
-    list_display = ("__str__", "email", "organisation", "is_staff", "is_superuser")
-    list_filter = ("is_staff", "is_superuser")
+    list_display = (
+        "__str__", "email", "organisation",
+        "has_completed_registration",
+        "is_active", "is_staff", "is_superuser",
+        "first_factor", "second_factor",
+    )
+    list_filter = (
+        "has_completed_registration",
+        "is_active", "is_staff", "is_superuser",
+        "first_factor", "second_factor",
+    )
     search_fields = ("first_name", "last_name", "email", "organisation__name")
     ordering = ("email",)
 

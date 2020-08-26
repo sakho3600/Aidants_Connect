@@ -1,0 +1,24 @@
+{% extends 'flexauth/register/base.html' %}
+
+{% block stepname %}Votre organisation{% endblock %}
+
+{% block stepintro %}
+
+    {% if new_user %}
+
+        <p>Bienvenue parmi nous, {{ new_user.first_name }} ! 👋</p>
+        <p>Vous faites partie de l'organisation suivante : <strong>{{ new_user.organisation.name }}</strong></p>
+        <p><a href="{% url 'flexauth:register_first_factor' %}">Cliquez ici</a> pour continuer le processus d'inscription.</p>
+
+    {% else %}
+
+        <p>L'inscription à AidantsConnect est pour le moment <strong>réservée aux collaborateurs de nos organisations partenaires</strong>.</p>
+        <p>Nous n'avons pas réussi à vous identifier comme tel·le, nous ne pouvons donc pas donner suite à votre demande.</p>
+        <p><a href="{% url 'home_page' %}">Cliquez ici</a> pour retourner à la page d'accueil.</p>
+
+    {% endif %}
+
+{% endblock %}
+
+{# No actual form in restricted mode #}
+{% block stepform %}{% endblock %}

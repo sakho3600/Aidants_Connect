@@ -28,8 +28,27 @@ def register_identity(request):
     if request.method == 'POST':
         form = forms.IdentityForm(request.POST)
         if form.is_valid():
-            new_user = form.save()
-            request.session['new_user_id'] = new_user.id
+
+            # Open registration: we create the user account.
+            if REGISTRATION_MODE == 'open':
+                new_user = form.save()
+                new_user_id = new_user.id
+
+            # Restricted registration: we look for a pre-registered account.
+            elif REGISTRATION_MODE == 'restricted':
+                email = form.cleaned_data.get('email')
+                try:
+                    new_user = User.objects.get(
+                        username=email,
+                        organisation__isnull=False,
+                        has_completed_registration=False,
+                    )
+                except User.DoesNotExist:
+                    new_user_id = -1
+                else:
+                    new_user_id = new_user.id
+
+            request.session['new_user_id'] = new_user_id
             return redirect(request.POST.get('next'))
     else:
         form = forms.IdentityForm()
@@ -46,10 +65,12 @@ def register_organisation(request):
     if REGISTRATION_MODE not in ('open', 'restricted'):
         return redirect('home_page')
 
+    new_user = None
     try:
         new_user = User.objects.get(pk=request.session.get('new_user_id'))
     except User.DoesNotExist:
-        return redirect('flexauth:register')
+        if REGISTRATION_MODE == 'open':
+            return redirect('flexauth:register')
 
     if request.method == 'POST':
         form = forms.OrganisationForm(request.POST, instance=new_user)
@@ -59,7 +80,11 @@ def register_organisation(request):
     else:
         form = forms.OrganisationForm()
 
-    template_name = "%s/%s.html" % (TEMPLATES_PATH, 'organisation')
+    template_name = "%s/%s_%s.html" % (
+        TEMPLATES_PATH,
+        'organisation',
+        REGISTRATION_MODE,
+    )
     return render(request, template_name, {
         'form': form,
         'prev': 'flexauth:register',
